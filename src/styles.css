@@ -1,3 +1,9 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+html, body, app-root, main {
+  height: 100% !important;
+  background: #fff;
+  margin: 0;
+}
