@@ -10,6 +10,7 @@ import firebase from 'firebase/app';
   styleUrls: ['./navbar.component.css']
 })
 export class NavbarComponent {
+  showProfile: boolean = false;
   hideNavbar: boolean = false;
   loggedIn: boolean = true;
   user: any;
@@ -35,5 +36,13 @@ export class NavbarComponent {
         }
       }
     );
+  }
+
+  setShowProfile() {
+    this.showProfile = !this.showProfile;
+  }
+
+  requestLogout() {
+    this.auth.signOut();
   }
 }

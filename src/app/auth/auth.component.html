@@ -11,11 +11,11 @@
         Sign up for a new account
       </h2>
 
-      <h4 *ngIf="!signIn" class="text-center text-2xl font-bold text-indigo-500">
-        Got an account? <a class="cursor-pointer font-black text-indigo-700" (click)="setAuthMethod()">Sign In</a>
+      <h4 *ngIf="!signIn" class="text-center text-2xl font-bold">
+        Got an account? <a class="cursor-pointer font-black text-indigo-500" (click)="setAuthMethod()">Sign In</a>
       </h4>
-      <h4 *ngIf="signIn" class="text-center text-2xl font-bold text-indigo-500">
-        New user? <a class="cursor-pointer font-black text-indigo-700" (click)="setAuthMethod()">Sign Up</a>
+      <h4 *ngIf="signIn" class="text-center text-2xl font-bold">
+        New user? <a class="cursor-pointer font-black text-indigo-500" (click)="setAuthMethod()">Sign Up</a>
       </h4>
 
     </div>
