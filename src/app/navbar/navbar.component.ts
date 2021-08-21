@@ -28,7 +28,6 @@ export class NavbarComponent {
 
     this.auth.user$.subscribe(
       (user: firebase.User) => {
-        console.log(user);
         if (user) {
           this.user = user;
           this.loggedIn = true;
