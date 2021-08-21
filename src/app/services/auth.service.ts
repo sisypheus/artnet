@@ -9,10 +9,17 @@ import { switchMap } from 'rxjs/operators';
 })
 export class AuthService {
   isSignedIn: boolean = false;
-  user!: firebase.User | null;
-  user$: Observable<firebase.User | null> = this.afAuth.authState;
+  user$: Observable<any> = this.afAuth.authState.pipe(
+    switchMap(user => {
+      if (user) {
+        return this.afs.doc('users/' + user.uid).valueChanges();
+      } else {
+        return of(null);
+      }
+    }
+  ));
 
-  constructor(public afAuth: AngularFireAuth, private afs: AngularFirestore) { }
+  constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) { }
 
   signUpWithCredentials(email: string, password: string, name: string) {
     this.afAuth.createUserWithEmailAndPassword(email, password).then(
@@ -58,7 +65,7 @@ export class AuthService {
     const data = {
       uid: user.uid,
       email: user.email,
-      displayName: name !== null && name !== '' ? name : user.displayName,
+      displayName: name ? name : user.displayName,
       photoURL: user.photoURL,
     }
     userRef.set(data, { merge: true });
