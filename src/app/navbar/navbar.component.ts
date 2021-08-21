@@ -13,9 +13,9 @@ export class NavbarComponent {
   showProfile: boolean = false;
   hideNavbar: boolean = false;
   loggedIn: boolean = true;
-  user: any;
+  user: any = null;
 
-  constructor(private router: Router, public auth: AuthService) {
+  constructor(private router: Router, private auth: AuthService) {
     //check if we need to display or not the navbar
     this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
@@ -27,11 +27,13 @@ export class NavbarComponent {
     });
 
     this.auth.user$.subscribe(
-      (user: Object) => {
+      (user: firebase.User) => {
+        console.log(user);
         if (user) {
-          this.loggedIn = true;
           this.user = user;
+          this.loggedIn = true;
         } else {
+          this.user = null;
           this.loggedIn = false;
         }
       }

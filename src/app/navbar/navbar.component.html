@@ -15,8 +15,8 @@
               <span class="sr-only">Open user menu</span>
               <img *ngIf="!user?.photoURL" class="h-8 w-8 rounded-full" src="https://www.acumarketing.com/acupuncture-websites/wp-content/uploads/2020/01/anonymous-avatar-sm.jpg" alt="">
               <img *ngIf="user?.photoURL" class="h-8 w-8 rounded-full" [src]="user?.photoURL" alt="">
-              <p class="text-white ml-3 hidden md:flex">
-                {{ user.displayName }}
+              <p class="text-white ml-3 hidden sm:flex">
+                {{ user?.displayName }}
               </p>
             </button>
           </div>

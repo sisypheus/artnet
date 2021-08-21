@@ -62,13 +62,18 @@ export class AuthService {
   updateUserData(user: firebase.User, name: string | null = null) {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc('users/' + user.uid);
 
-    const data = {
-      uid: user.uid,
-      email: user.email,
-      displayName: name ? name : user.displayName,
-      photoURL: user.photoURL,
-    }
-    userRef.set(data, { merge: true });
+    //necessary to avoid resetting user name
+    userRef.get().subscribe(
+      (doc: any) => {
+        const data = {
+          uid: user.uid,
+          email: user.email,
+          displayName: name || doc?.data()?.displayName,
+          photoURL: user.photoURL,
+        }
+        userRef.set(data, { merge: true });
+      }
+    );
   }
 
   signOut() {
