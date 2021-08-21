@@ -14,15 +14,21 @@ export class NavbarComponent {
   hideNavbar: boolean = false;
   loggedIn: boolean = true;
   user: any = null;
+  redirectToHome: boolean = false;
 
   constructor(private router: Router, private auth: AuthService) {
     //check if we need to display or not the navbar
+    //another check is to redirect to home if user is on /profile route
     this.router.events.subscribe((val) => {
       if (val instanceof NavigationEnd) {
         if (val.url === '/auth')
           this.hideNavbar = true;
         else if (this.hideNavbar)
           this.hideNavbar = false;
+        if (val.url === '/profile')
+          this.redirectToHome = true;
+        else if (this.redirectToHome)
+          this.redirectToHome = false;
       }
     });
 
@@ -45,5 +51,7 @@ export class NavbarComponent {
 
   requestLogout() {
     this.auth.signOut();
+    if (this.redirectToHome)
+      this.router.navigate(['/']);
   }
 }
