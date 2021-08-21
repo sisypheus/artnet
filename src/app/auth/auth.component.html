@@ -2,13 +2,31 @@
   <div class="max-w-md w-full space-y-8">
     <div>
       <img  [routerLink]="['/']" class="mx-auto h-16 w-auto cursor-pointer" src="https://tailwindui.com/img/logos/workflow-mark-indigo-600.svg" alt="Workflow">
-      <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+
+      <!-- sign up or login -->
+      <h2 *ngIf="signIn" class="mt-6 text-center text-3xl font-extrabold text-gray-900">
         Sign in to your account
       </h2>
+      <h2 *ngIf="!signIn" class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+        Sign up for a new account
+      </h2>
+
+      <h4 *ngIf="!signIn" class="text-center text-2xl font-bold text-indigo-500">
+        Got an account? <a class="cursor-pointer font-black text-indigo-700" (click)="setAuthMethod()">Sign In</a>
+      </h4>
+      <h4 *ngIf="signIn" class="text-center text-2xl font-bold text-indigo-500">
+        New user? <a class="cursor-pointer font-black text-indigo-700" (click)="setAuthMethod()">Sign Up</a>
+      </h4>
+
     </div>
-    <form class="mt-8 space-y-6" [formGroup]="signInForm" (ngSubmit)="onSubmit()">
+    <form class="mt-8 space-y-6" [formGroup]="authForm" (ngSubmit)="onSubmit()">
       <input type="hidden" name="remember" value="true">
       <div class="rounded-md shadow-sm -space-y-px">
+        <!-- add name field for signup -->
+        <div *ngIf="!signIn">
+          <label for="name" class="sr-only">Email address</label>
+          <input formControlName="name" id="name" name="name" type="name" autocomplete="name" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Full name">
+        </div>
         <div>
           <label for="email-address" class="sr-only">Email address</label>
           <input formControlName="email" id="email-address" name="email" type="email" autocomplete="email" class="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 focus:z-10 sm:text-sm" placeholder="Email address">

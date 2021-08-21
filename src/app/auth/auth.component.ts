@@ -1,3 +1,4 @@
+import { Router } from '@angular/router';
 import { AuthService } from './../services/auth.service';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder } from '@angular/forms';
@@ -8,20 +9,33 @@ import { FormBuilder } from '@angular/forms';
   styleUrls: ['./auth.component.css']
 })
 export class AuthComponent {
-  signInForm = this.formBuilder.group({
+  signIn: boolean = true;
+
+  authForm = this.formBuilder.group({
     email: '',
     password: '',
+    name: '',
   });
 
-  constructor(private formBuilder: FormBuilder, private authService: AuthService) { }
+  constructor(private formBuilder: FormBuilder, private router: Router, public authService: AuthService) {
+    authService.user$.subscribe(user => {
+      if (user)
+        this.router.navigate(['/']);
+    });
+  }
+
+  setAuthMethod() {
+    this.signIn = !this.signIn;
+  }
 
   onSubmit() {
-    this.authService.signInWithCredentials(this.signInForm.value.email, this.signInForm.value.password);
-    // console.log(this.authService.isSignedIn);
+    if (this.signIn)
+      this.authService.signInWithCredentials(this.authForm.value.email, this.authForm.value.password);
+    else
+      this.authService.signUpWithCredentials(this.authForm.value.email, this.authForm.value.password, this.authForm.value.name);
   }
 
   googleLogin() {
     this.authService.signInWithGoogle();
-    console.log('iuc');
   }
 }

@@ -1,29 +1,24 @@
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
 import firebase from 'firebase/app';
-
+import { Observable, of } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   isSignedIn: boolean = false;
+  user!: firebase.User | null;
+  user$: Observable<firebase.User | null> = this.afAuth.authState;
 
-  constructor(public afAuth: AngularFireAuth) { 
-    //watching for changes in the authentication state
-    this.afAuth.authState.subscribe(
-      (user: any) => {
-        if (user)
-          this.isSignedIn = true;
-        else
-          this.isSignedIn = false;
-      }
-    );
-  }
+  constructor(public afAuth: AngularFireAuth, private afs: AngularFirestore) { }
 
-  signUpWithCredentials(email: string, password: string) {
+  signUpWithCredentials(email: string, password: string, name: string) {
     this.afAuth.createUserWithEmailAndPassword(email, password).then(
       (success: any) => {
         console.log(success);
+        this.updateUserData(success.user, name);
       }
     ).catch(
       (_: any) => {
@@ -35,7 +30,7 @@ export class AuthService {
   signInWithCredentials(email: string, password: string) {
     this.afAuth.signInWithEmailAndPassword(email, password).then(
       (success: any) => {
-        console.log(success);
+        this.updateUserData(success.user);
       }
     ).catch(
       (error: any) => {
@@ -48,14 +43,25 @@ export class AuthService {
     const googleAuthProvider = new firebase.auth.GoogleAuthProvider();
     this.afAuth.signInWithPopup(googleAuthProvider).then(
       (success: any) => {
-        console.log(success);
-        console.log(this.afAuth.user);
+        this.updateUserData(success.user);
       }
     ).catch(
       (_: any) => {
         alert('Something went wrong');
       }
     );
+  }
+
+  updateUserData(user: firebase.User, name: string | null = null) {
+    const userRef: AngularFirestoreDocument<any> = this.afs.doc('users/' + user.uid);
+
+    const data = {
+      uid: user.uid,
+      email: user.email,
+      displayName: name !== null && name !== '' ? name : user.displayName,
+      photoURL: user.photoURL,
+    }
+    userRef.set(data, { merge: true });
   }
 
   signOut() {
