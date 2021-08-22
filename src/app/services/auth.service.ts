@@ -11,15 +11,19 @@ export class AuthService {
   isSignedIn: boolean = false;
   user$: Observable<any> = this.afAuth.authState.pipe(
     switchMap(user => {
-      if (user) {
+      if (user)
         return this.afs.doc('users/' + user.uid).valueChanges();
-      } else {
+      else
         return of(null);
-      }
     }
   ));
+  user: firebase.User | null = null;
 
-  constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) { }
+  constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) {
+    this.user$.subscribe(
+      (user: firebase.User) => this.user = user
+    );
+  }
 
   signUpWithCredentials(email: string, password: string, name: string) {
     this.afAuth.createUserWithEmailAndPassword(email, password).then(

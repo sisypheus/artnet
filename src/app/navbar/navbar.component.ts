@@ -16,7 +16,7 @@ export class NavbarComponent {
   user: any = null;
   redirectToHome: boolean = false;
 
-  constructor(private router: Router, private auth: AuthService) {
+  constructor(private router: Router, public auth: AuthService) {
     //check if we need to display or not the navbar
     //another check is to redirect to home if user is on /profile route
     this.router.events.subscribe((val) => {
@@ -31,18 +31,6 @@ export class NavbarComponent {
           this.redirectToHome = false;
       }
     });
-
-    this.auth.user$.subscribe(
-      (user: firebase.User) => {
-        if (user) {
-          this.user = user;
-          this.loggedIn = true;
-        } else {
-          this.user = null;
-          this.loggedIn = false;
-        }
-      }
-    );
   }
 
   setShowProfile() {
