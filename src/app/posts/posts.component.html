@@ -1,1 +1,7 @@
-<p>posts works!</p>
+<div class="flex items-center justify-center mt-4">
+  <div class="w-full max-w-md">
+    <div *ngFor="let post of posts">
+      <app-post [post]="post"></app-post>
+    </div>
+  </div>
+</div>

@@ -25,9 +25,9 @@ export class ProfileComponent implements OnInit {
       .get()
       .then((querySnapshot) => {
         this.posts = querySnapshot.docs.map((doc) => {
-          const data = doc.data();
-          data.id = doc.id;
-          return { ...data };
+          const postdata = doc.data();
+          postdata.id = doc.id;
+          return { ...postdata};
         });
         console.log(this.posts);
       });

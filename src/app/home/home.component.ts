@@ -46,7 +46,8 @@ export class HomeComponent {
           .add({
             caption: caption,
             file: url,
-            fileType: metadata
+            fileType: metadata,
+            created: firebase.firestore.FieldValue.serverTimestamp(),
           });
       });
     }
