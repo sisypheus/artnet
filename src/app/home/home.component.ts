@@ -14,38 +14,44 @@ export class HomeComponent {
   file: File | null = null ;
   constructor(public auth: AuthService, private storage: AngularFireStorage) { }
 
-  async fileUploader(): Promise<String> {
+  async fileUploader(): Promise<any> {
     const path = `post/${this.auth.user?.uid}/${Date.now()}`;
-    const ref = this.storage.ref(path);
     const task = await this.storage.upload(path, this.file);
-    return this.storage.ref(path).getDownloadURL().toPromise();
+    const metadata = await this.storage.ref(path).getMetadata().toPromise().then(value => value);
+    const res = await this.storage.ref(path).getDownloadURL().toPromise().then(value => value);
+    return [res, metadata.contentType];
   }
 
-  submitPost(): void {
-    if (!this.caption && !this.file)
+  submitPost(caption: string): void {
+    if (!caption && !this.file)
       return;
 
-    //file handling
     if (!this.file) {
       firebase.firestore()
         .collection('posts')
         .doc(this.auth.user?.uid)
         .collection('userPosts')
         .add({
-          caption: this.caption,
+          caption: caption,
         });
-        return;
+        this.caption = '';
+    } else {
+    //file handling
+      this.fileUploader().then(([url, metadata]) => {
+        firebase.firestore()
+          .collection('posts')
+          .doc(this.auth.user?.uid)
+          .collection('userPosts')
+          .add({
+            caption: caption,
+            file: url,
+            fileType: metadata
+          });
+      });
     }
-    this.fileUploader().then(url => {
-      firebase.firestore()
-        .collection('posts')
-        .doc(this.auth.user?.uid)
-        .collection('userPosts')
-        .add({
-          caption: this.caption,
-          file: url,
-        });
-    });
+    this.caption = '';
+    this.file = null;
+    this.fileName = '';
   }
 
   onFileSelected(event: Event): void {

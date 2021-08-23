@@ -8,12 +8,12 @@
           <!-- file area -->
           <div class="flex items-center justify-center">
             <input type="file" class="hidden" #fileUpload (change)="onFileSelected($event)" />
-            <p class="max-w-xs">{{ fileName ? fileName.substring(0,24) + '...' : "No file selected"}}</p>
+            <p class="max-w-xs">{{ fileName ? (fileName.length > 24 ? fileName.substring(0,24) + '...' : fileName) : "No file selected"}}</p>
             <button (click)="fileUpload.click()"> 
               <i class="fa fa-cloud-upload-alt fa-2x pl-2"></i>
             </button>
           </div>
-          <button (click)="submitPost()" class="bg-green-500 justify-self-end hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">Create Post</button>
+          <button (click)="submitPost(caption)" class="bg-green-500 justify-self-end hover:bg-green-400 text-white font-bold py-2 px-4 border-b-4 border-green-700 hover:border-green-500 rounded">Create Post</button>
         </div>
       </div>
 
