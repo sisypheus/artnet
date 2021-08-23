@@ -2,7 +2,7 @@
   <div class="max-w-md w-full space-y-8">
     <div>
       <!-- post box creation -->
-      <div *ngIf="auth.user "class="border-2 border-black p-3 rounded-lg">
+      <div *ngIf="auth.user$ | async; else notLoggedIn"class="border-2 border-black p-3 rounded-lg">
         <textarea [(ngModel)]="caption" type="input" placeholder="Create a post..." class="w-full p-2 focus:outline-none focus:ring-2 focus:ring-gray-300 text-xl"></textarea>
         <div class="flex justify-between">
           <!-- file area -->
@@ -18,12 +18,14 @@
       </div>
 
       <!-- case user is not connected -->
-      <div *ngIf="!auth.user "class="border-2 border-black p-3 rounded-lg">
-        <textarea type="input" placeholder="Please login to create a post" class="w-full p-2 focus:outline-none focus:ring-2 focus:ring-gray-300 text-xl"></textarea>
-        <div class="flex justify-end">
-          <button disabled class="bg-gray-500 justify-self-end text-white font-bold py-2 px-4 border-b-4 border-gray-700 rounded">Create Post</button>
+      <ng-template #notLoggedIn>
+        <div class="border-2 border-black p-3 rounded-lg">
+          <textarea type="input" placeholder="Please login to create a post" class="w-full p-2 focus:outline-none focus:ring-2 focus:ring-gray-300 text-xl"></textarea>
+          <div class="flex justify-end">
+            <button disabled class="bg-gray-500 justify-self-end text-white font-bold py-2 px-4 border-b-4 border-gray-700 rounded">Create Post</button>
+          </div>
         </div>
-      </div>
+      </ng-template>
     </div>
   </div>
 </div>

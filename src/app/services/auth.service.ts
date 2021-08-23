@@ -8,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  isSignedIn: boolean = false;
+  loggedIn: boolean = true;
   user$: Observable<any> = this.afAuth.authState.pipe(
     switchMap(user => {
       if (user)
@@ -21,7 +21,8 @@ export class AuthService {
 
   constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) {
     this.user$.subscribe(
-      (user: firebase.User) => this.user = user
+      (user: firebase.User) => {this.user = user; this.loggedIn = true;},
+      (cache: null) => {this.user = null; this.loggedIn = false;}
     );
   }
 

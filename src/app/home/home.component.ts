@@ -33,6 +33,7 @@ export class HomeComponent {
         .collection('userPosts')
         .add({
           caption: caption,
+          created: firebase.firestore.FieldValue.serverTimestamp(),
         });
         this.caption = '';
     } else {
