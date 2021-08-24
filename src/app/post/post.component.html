@@ -1,12 +1,13 @@
 <div class="flex items-center justify-center px-1 mb-2">
   <div class="w-full max-w-md mx-auto border-black border-2 shadow-lg">
-    <img class="object-cover w-full h-48 mt-2 border-black" [src]="post.file" alt="Image of the post" />
-    <audio onmouseover="this.play()" onmouseout="this.pause()" controls>  
+    <img *ngIf="post.fileType.includes('image/')" class="object-cover w-full h-96 mt-2 border-black" [src]="post.file" alt="Image of the post" />
+    <audio *ngIf="post.fileType.includes('audio/')" class="w-full" onmouseover="this.play()" onmouseout="this.pause()" controls>  
       <source [src]="post.file">
     </audio>
-    <video onmouseover="this.play()" onmouseleave="this.pause()" controls>
+    <video *ngIf="post.fileType.includes('video/')" onmouseover="this.play()" onmouseleave="this.pause()" controls>
       <source [src]="post.file">
     </video>
+
     <div class="flex items-center justify-between px-4 py-2 bg-gray-200">
       <h2>{{ post.caption }}</h2>
     </div>
