@@ -9,13 +9,17 @@ import { AngularFirestore } from '@angular/fire/firestore';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   caption: string = '';
   fileName: string = '';
   file: File | null = null ;
   posts: any[] = [];
 
   constructor(private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage) {}
+
+  ngOnInit():void {
+    this.fetchAllPosts();
+  }
 
   async fileUploader(): Promise<any> {
     const path = `post/${this.auth.user?.uid}/${Date.now()}`;
