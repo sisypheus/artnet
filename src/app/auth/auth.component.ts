@@ -18,7 +18,7 @@ export class AuthComponent {
   });
 
   constructor(private formBuilder: FormBuilder, private router: Router, public authService: AuthService) {
-    authService.user$.subscribe(user => {
+    authService.user$.subscribe((user: any) => {
       if (user)
         this.router.navigate(['/']);
     });

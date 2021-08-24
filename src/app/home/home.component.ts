@@ -17,8 +17,8 @@ export class HomeComponent {
   async fileUploader(): Promise<any> {
     const path = `post/${this.auth.user?.uid}/${Date.now()}`;
     const task = await this.storage.upload(path, this.file);
-    const metadata = await this.storage.ref(path).getMetadata().toPromise().then(value => value);
-    const res = await this.storage.ref(path).getDownloadURL().toPromise().then(value => value);
+    const metadata = await this.storage.ref(path).getMetadata().toPromise().then(value => value).catch(error => error);
+    const res = await this.storage.ref(path).getDownloadURL().toPromise().then(value => value).catch(error => error);
     return [res, metadata.contentType];
   }
 
@@ -49,7 +49,7 @@ export class HomeComponent {
             fileType: metadata,
             created: firebase.firestore.FieldValue.serverTimestamp(),
           });
-      });
+      }).catch(error => alert(error));
     }
     this.caption = '';
     this.file = null;

@@ -12,8 +12,6 @@ import firebase from 'firebase/app';
 export class NavbarComponent {
   showProfile: boolean = false;
   hideNavbar: boolean = false;
-  loggedIn: boolean = true;
-  user: any = null;
   redirectToHome: boolean = false;
 
   constructor(private router: Router, public auth: AuthService) {

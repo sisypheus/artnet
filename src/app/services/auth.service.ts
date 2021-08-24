@@ -8,7 +8,7 @@ import { switchMap } from 'rxjs/operators';
   providedIn: 'root'
 })
 export class AuthService {
-  loggedIn: boolean = true;
+  loggedIn: any = true;
   user$: Observable<any> = this.afAuth.authState.pipe(
     switchMap(user => {
       if (user)
@@ -17,19 +17,27 @@ export class AuthService {
         return of(null);
     }
   ));
+  loginPersistence: string | null = localStorage.getItem('login');
   user: firebase.User | null = null;
 
   constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) {
     this.user$.subscribe(
-      (user: firebase.User) => {this.user = user; this.loggedIn = true;},
-      (cache: null) => {this.user = null; this.loggedIn = false;}
+      (user: firebase.User | null) => {
+        this.user = user;
+        if (user) {
+          localStorage.setItem('login', user.uid);
+          this.loginPersistence = localStorage.getItem('login');
+        } else {
+          localStorage.removeItem('login');
+          this.loginPersistence = null;
+        }
+      }
     );
   }
 
   signUpWithCredentials(email: string, password: string, name: string) {
     this.afAuth.createUserWithEmailAndPassword(email, password).then(
       (success: any) => {
-        console.log(success);
         this.updateUserData(success.user, name);
       }
     ).catch(
