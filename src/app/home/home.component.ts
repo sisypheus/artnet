@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import firebase from 'firebase/app';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from '../services/auth.service';
+import { AngularFirestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-home',
@@ -12,13 +13,15 @@ export class HomeComponent {
   caption: string = '';
   fileName: string = '';
   file: File | null = null ;
-  constructor(public auth: AuthService, private storage: AngularFireStorage) { }
+  posts: any[] = [];
+
+  constructor(private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage) {}
 
   async fileUploader(): Promise<any> {
     const path = `post/${this.auth.user?.uid}/${Date.now()}`;
     const task = await this.storage.upload(path, this.file);
-    const metadata = await this.storage.ref(path).getMetadata().toPromise().then(value => value).catch(error => error);
-    const res = await this.storage.ref(path).getDownloadURL().toPromise().then(value => value).catch(error => error);
+    const metadata = await this.storage.ref(path).getMetadata().toPromise().then((value: any) => value).catch((error: any) => error);
+    const res = await this.storage.ref(path).getDownloadURL().toPromise().then((value: any) => value).catch((error: any) => error);
     return [res, metadata.contentType];
   }
 
@@ -61,5 +64,19 @@ export class HomeComponent {
     const file: File = (target.files as FileList)[0];
     this.file = file;
     this.fileName = file.name;
+  }
+
+  fetchAllPosts(): void {
+    firebase.firestore()
+      .collectionGroup('userPosts')
+      .orderBy('created', 'desc')
+      .get()
+      .then((snapshot: any) => {
+        this.posts = snapshot.docs.map((doc: any) => {
+          const postdata = doc.data();
+          postdata.id = doc.id;
+          return { ...postdata};
+        });
+      });
   }
 }
