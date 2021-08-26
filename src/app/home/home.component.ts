@@ -4,6 +4,7 @@ import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from '../services/auth.service';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { UserService } from '../services/user.service';
+import { PostsService } from '../services/posts.service';
 
 @Component({
   selector: 'app-home',
@@ -16,10 +17,10 @@ export class HomeComponent implements OnInit {
   file: File | null = null ;
   posts: any[] = [];
 
-  constructor(private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage, private uService: UserService) {}
+  constructor(public postsService: PostsService, private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage, private uService: UserService) {}
 
   ngOnInit():void {
-    this.fetchAllPosts();
+    this.postsService.fetchAllPosts();
   }
 
   async fileUploader(): Promise<any> {
@@ -45,7 +46,7 @@ export class HomeComponent implements OnInit {
           created: firebase.firestore.FieldValue.serverTimestamp(),
           creator: this.auth.user?.uid
         }).finally(() => {
-          this.fetchAllPosts();
+          this.postsService.fetchAllPosts();
         });
         this.caption = '';
     } else {
@@ -62,7 +63,7 @@ export class HomeComponent implements OnInit {
             created: firebase.firestore.FieldValue.serverTimestamp(),
             creator: this.auth.user?.uid,
           }).finally(() => {
-            this.fetchAllPosts();
+            this.postsService.fetchAllPosts();
           });
       }).catch(error => alert(error));
     }
@@ -76,19 +77,5 @@ export class HomeComponent implements OnInit {
     const file: File = (target.files as FileList)[0];
     this.file = file;
     this.fileName = file.name;
-  }
-
-  fetchAllPosts(): void {
-    firebase.firestore()
-      .collectionGroup('userPosts')
-      .orderBy('created', 'desc')
-      .get()
-      .then((snapshot: any) => {
-        this.posts = snapshot.docs.map((doc: any) => {
-          const postdata = doc.data();
-          postdata.id = doc.id;
-          return { ...postdata};
-        });
-      });
   }
 }
