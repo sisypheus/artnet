@@ -3,6 +3,7 @@ import firebase from 'firebase/app';
 import { AngularFireStorage } from '@angular/fire/storage';
 import { AuthService } from '../services/auth.service';
 import { AngularFirestore } from '@angular/fire/firestore';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-home',
@@ -15,7 +16,7 @@ export class HomeComponent implements OnInit {
   file: File | null = null ;
   posts: any[] = [];
 
-  constructor(private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage) {}
+  constructor(private afs: AngularFirestore, public auth: AuthService, private storage: AngularFireStorage, private uService: UserService) {}
 
   ngOnInit():void {
     this.fetchAllPosts();
@@ -29,10 +30,11 @@ export class HomeComponent implements OnInit {
     return [res, metadata.contentType];
   }
 
-  submitPost(caption: string): void {
+  async submitPost(caption: string): Promise<void> {
     if (!caption && !this.file)
       return;
-
+    else if (!this.auth.user)
+      return;
     if (!this.file) {
       firebase.firestore()
         .collection('posts')
@@ -41,6 +43,9 @@ export class HomeComponent implements OnInit {
         .add({
           caption: caption,
           created: firebase.firestore.FieldValue.serverTimestamp(),
+          creator: this.auth.user?.uid
+        }).finally(() => {
+          this.fetchAllPosts();
         });
         this.caption = '';
     } else {
@@ -55,6 +60,9 @@ export class HomeComponent implements OnInit {
             file: url,
             fileType: metadata,
             created: firebase.firestore.FieldValue.serverTimestamp(),
+            creator: this.auth.user?.uid,
+          }).finally(() => {
+            this.fetchAllPosts();
           });
       }).catch(error => alert(error));
     }
