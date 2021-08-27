@@ -28,6 +28,13 @@ export class PostComponent implements OnInit {
       this.postsService.likePost(this.post.id);
   }
 
+  setSave() {
+    if (this.post.saved)
+      this.postsService.unsavePost(this.post.id);
+    else
+      this.postsService.savePost(this.post.id);
+  }
+
   safeUrl() {
     return this.sanitizer.bypassSecurityTrustResourceUrl(this.post.file);
   }

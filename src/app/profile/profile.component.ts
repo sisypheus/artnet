@@ -28,8 +28,10 @@ export class ProfileComponent implements OnInit {
         this.postsService.getLikedPosts();
       else if (selected === 'Posts')
         this.postsService.fetchUserPosts();
-      else
-        this.postsService.fetchUserSavedPosts();
+      else {
+        console.log('ici');
+        this.postsService.getSavedPosts();
+      }
     }
   }
 }

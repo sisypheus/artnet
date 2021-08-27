@@ -12,25 +12,23 @@ export class PostsService {
   constructor(private auth: AuthService, private ref: ApplicationRef) { }
 
   async fetchAllPosts() {
-    firebase.firestore()
+    return firebase.firestore()
       .collectionGroup('userPosts')
       .orderBy('created', 'desc')
       .get()
-      .then((snapshot: any) => {
-        this.auth.user$.subscribe(async (user) => {
+      .then(async (snapshot: any) => {
             this.posts = snapshot.docs.map(async (doc: any) => {
               const postdata = doc.data();
               postdata.id = doc.id;
 
-              if (user)
+              if (this.auth.user) {
+                postdata.saved = await this.isPostSaved(postdata);
                 postdata.liked = await this.isPostLiked(postdata);
-              else
+              } else
                 postdata.liked = false;
               return { ...postdata};
             });
             this.posts = await Promise.all(this.posts).then((posts) => posts);
-          }
-        );
       });
   }
 
@@ -46,6 +44,7 @@ export class PostsService {
           const postdata = doc.data();
           postdata.id = doc.id;
           postdata.liked = await this.isPostLiked(postdata);
+          postdata.saved = await this.isPostSaved(postdata);
           return { ...postdata};
         });
         this.posts = await Promise.all(this.posts).then((posts) => posts);
@@ -53,7 +52,7 @@ export class PostsService {
   }
 
   async isPostLiked(post: any) {
-    const exists = await firebase.firestore()
+    const exists = firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
@@ -64,24 +63,48 @@ export class PostsService {
       .then((doc) => {
         return doc.exists;
       });
-    return exists;
+    return await exists;
   }
 
-  fetchUserSavedPosts(): void {
-    //
-  }
-
-  fetchAllLikedPosts(post: any, index: number) {
-    firebase.firestore()
+  async isPostSaved(post: any) {
+    const exists = firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
       .doc(post.id)
-      .collection('likes')
+      .collection('saved')
       .doc(this.auth.user?.uid)
-      .onSnapshot((snapshot: any) => {
-        post.liked = snapshot.exists;
+      .get()
+      .then((doc) => {
+        return doc.exists;
       });
+    return await exists;
+  }
+
+  savePost(postId: string) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(this.auth.user?.uid)
+      .collection('userPosts')
+      .doc(postId)
+      .collection('saved')
+      .doc(this.auth.user?.uid)
+      .set({});
+    let post = this.posts.find((post: any) => post.id === postId);
+    post.saved = true;
+  }
+
+  unsavePost(postId: string) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(this.auth.user?.uid)
+      .collection('userPosts')
+      .doc(postId)
+      .collection('saved')
+      .doc(this.auth.user?.uid)
+      .delete();
+    let post = this.posts.find((post: any) => post.id === postId);
+    post.saved = false;
   }
 
   likePost(postId: string) {
@@ -127,5 +150,10 @@ export class PostsService {
   async getLikedPosts() {
     await this.fetchUserPosts();
     this.posts = this.posts.filter((post: any) => post.liked);
+  }
+
+  async getSavedPosts() {
+    await this.fetchAllPosts();
+    this.posts = this.posts.filter((post: any) => post.saved);
   }
 }
