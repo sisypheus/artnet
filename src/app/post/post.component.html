@@ -1,6 +1,19 @@
 <div class="flex items-center justify-center px-1 mb-4">
   <div class="w-full max-w-md mx-auto border-gray-500 rounded-lg border-2 shadow-lg">
-    <h1 class="text-lg px-4 font-medium">{{ author }}</h1>
+    <div class="flex justify-between items-center">
+      <h1 class="text-lg px-4 font-medium">{{ author }}</h1>
+
+      <div class="relative">
+        <img (click)="setOptions()" class="w-10 h-10 pr-4 pt-1 cursor-pointer" src="../../assets/img/more.svg" />
+
+        <div *ngIf="options" class="border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-28 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+            <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700"
+              role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
+            <a class="block px-4 py-2 text-sm text-gray-700" role="menuitem"
+              tabindex="-1" id="user-menu-item-2">Sign out</a>
+          </div>
+      </div>
+    </div>
     
     <!-- file handler -->
     <div *ngIf="post.file">
@@ -11,7 +24,8 @@
       <video *ngIf="post.fileType.includes('video/')" onmouseover="this.play()" onmouseleave="this.pause()" controls>
         <source [src]="post.file">
       </video>
-      <embed class="object-cover w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl()" type="application/pdf" />
+      
+      <embed class="object-cover w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl" type="application/pdf" />
     </div>
 
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-b-lg">

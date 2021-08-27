@@ -3,7 +3,7 @@ import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import firebase from 'firebase/app';
 import { PostsService } from '../services/posts.service';
-import { DomSanitizer } from '@angular/platform-browser';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-post',
@@ -13,11 +13,14 @@ import { DomSanitizer } from '@angular/platform-browser';
 export class PostComponent implements OnInit {
   @Input('post') post: any;
   author: string = '';
+  options: boolean = false;
+  safeUrl: SafeResourceUrl = '';
 
   constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
   }
-
+  
   ngOnInit() {
+    this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.post.file);
     this.uService.getUserFromUid(this.post.creator).then(user => this.author = user);
   }
 
@@ -35,7 +38,7 @@ export class PostComponent implements OnInit {
       this.postsService.savePost(this.post.id);
   }
 
-  safeUrl() {
-    return this.sanitizer.bypassSecurityTrustResourceUrl(this.post.file);
+  setOptions() {
+    this.options = !this.options;
   }
 }

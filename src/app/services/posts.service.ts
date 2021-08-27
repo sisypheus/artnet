@@ -156,4 +156,13 @@ export class PostsService {
     await this.fetchAllPosts();
     this.posts = this.posts.filter((post: any) => post.saved);
   }
+
+  deletePost(postId: string) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(this.auth.user?.uid)
+      .collection('userPosts')
+      .doc(postId)
+      .delete();
+  }
 }
