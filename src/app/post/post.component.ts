@@ -3,6 +3,7 @@ import { AuthService } from '../services/auth.service';
 import { UserService } from '../services/user.service';
 import firebase from 'firebase/app';
 import { PostsService } from '../services/posts.service';
+import { DomSanitizer } from '@angular/platform-browser';
 
 @Component({
   selector: 'app-post',
@@ -12,9 +13,8 @@ import { PostsService } from '../services/posts.service';
 export class PostComponent implements OnInit {
   @Input('post') post: any;
   author: string = '';
-  fields: number = 0;
 
-  constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService) {
+  constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
   }
 
   ngOnInit() {
@@ -26,5 +26,9 @@ export class PostComponent implements OnInit {
       this.postsService.unlikePost(this.post.id);
     else
       this.postsService.likePost(this.post.id);
+  }
+
+  safeUrl() {
+    return this.sanitizer.bypassSecurityTrustResourceUrl(this.post.file);
   }
 }

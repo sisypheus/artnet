@@ -11,6 +11,7 @@
       <video *ngIf="post.fileType.includes('video/')" onmouseover="this.play()" onmouseleave="this.pause()" controls>
         <source [src]="post.file">
       </video>
+      <embed class="object-cover w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl()" type="application/pdf" />
     </div>
 
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-b-lg">
