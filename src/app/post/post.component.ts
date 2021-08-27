@@ -14,9 +14,7 @@ export class PostComponent implements OnInit {
   author: string = '';
   fields: number = 0;
 
-  constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public ref: ChangeDetectorRef) {
-    //required to know if user liked it or not
-    setInterval(() => {}, 0);
+  constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService) {
   }
 
   ngOnInit() {

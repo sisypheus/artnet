@@ -101,6 +101,7 @@ export class PostsService {
       .update({likes: firebase.firestore.FieldValue.increment(1)});
     let post = this.posts.find((post: any) => post.id === postId);
     post.liked = true;
+    post.likes += 1;
   }
 
   unlikePost(postId: string) {
@@ -120,6 +121,7 @@ export class PostsService {
       .update({likes: firebase.firestore.FieldValue.increment(-1)});
     let post = this.posts.find((post: any) => post.id === postId);
     post.liked = false;
+    post.likes -= 1;
   }
 
   async getLikedPosts() {
