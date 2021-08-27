@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, NgZone } from '@angular/core';
+import { PostsService } from '../services/posts.service';
 
 @Component({
   selector: 'app-posts',
@@ -8,5 +9,7 @@ import { Component, Input, OnInit, ChangeDetectionStrategy, ChangeDetectorRef, N
 export class PostsComponent {
 
   @Input('posts') posts: any;
-  constructor() {}
+
+  constructor(public postsService: PostsService) {
+  }
 }

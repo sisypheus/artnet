@@ -1,6 +1,8 @@
+import { PostsService } from './../services/posts.service';
 import { Component, OnInit } from '@angular/core';
 import firebase from 'firebase/app';
 import { AuthService } from '../services/auth.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-profile',
@@ -9,28 +11,25 @@ import { AuthService } from '../services/auth.service';
 })
 export class ProfileComponent implements OnInit {
   posts: any[] = [];
+  current: string = 'Posts';
+  selected: string = 'cursor-pointer text-xl font-bold underline';
+  not: string = 'cursor-pointer text-xl font-bold';
 
-  constructor(private auth: AuthService) { }
+  constructor(private auth: AuthService, public postsService: PostsService) { }
 
   ngOnInit(): void {
-    this.fetchUserPosts();
+    this.postsService.fetchUserPosts();
   }
 
-  fetchUserPosts(): void {
-    firebase.firestore()
-      .collection('posts')
-      .doc(this.auth.user?.uid)
-      .collection('userPosts')
-      .orderBy('created', 'desc')
-      .get()
-      .then((querySnapshot) => {
-        this.posts = querySnapshot.docs.map((doc) => {
-          const postdata = doc.data();
-          postdata.id = doc.id;
-          return { ...postdata};
-        });
-        console.log(this.posts);
-      });
+  setCurrent(selected: string): void {
+    if (this.current !== selected) {
+      this.current = selected;
+      if (selected === 'Liked')
+        this.postsService.getLikedPosts();
+      else if (selected === 'Posts')
+        this.postsService.fetchUserPosts();
+      else
+        this.postsService.fetchUserSavedPosts();
+    }
   }
-
 }

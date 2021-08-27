@@ -1,26 +1,26 @@
 <div class="flex items-center justify-center">
   <div class="max-w-md mt-3">
     <div class="flex flex-row space-x-5 justify-center">
-      <p class="cursor-pointer text-xl font-bold underline">
+      <p (click)="setCurrent('Posts')" [class]="current === 'Posts' ? selected : not">
         Posts
       </p>
 
       <!-- vertical line -->
       <div class="border-l-2 border-black"></div>
 
-      <p class="cursor-pointer text-xl font-bold">
+      <p (click)="setCurrent('Saved')" [class]="current === 'Saved' ? selected : not">
         Saved
       </p>
 
       <!-- vertical line -->
       <div class="border-l-2 border-black"></div>
 
-      <p class="cursor-pointer text-xl font-bold">
+      <p (click)="setCurrent('Liked')" [class]="current === 'Liked' ? selected : not">
         Liked
       </p>
 
     </div>
 
-    <app-posts [posts]="posts"></app-posts>
+    <app-posts [posts]="postsService.posts"></app-posts>
   </div>
 </div>
