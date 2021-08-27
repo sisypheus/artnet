@@ -1,5 +1,5 @@
 <div class="flex items-center justify-center mt-2 px-1">
-  <div class="max-w-md w-full space-y-8">
+  <div class="max-w-lg w-full space-y-8">
     <div>
       <!-- post box creation -->
       <div *ngIf="auth.loginPersistence; else notLoggedIn"class="border-2 border-black p-3 rounded-lg">
@@ -8,7 +8,7 @@
           <!-- file area -->
           <div class="flex items-center justify-center">
             <input type="file" class="hidden" #fileUpload (change)="onFileSelected($event)" />
-            <p class="max-w-xs">{{ fileName ? (fileName.length > 24 ? fileName.substring(0,24) + '...' : fileName) : "No file selected"}}</p>
+            <p class="max-w-md">{{ fileName ? (fileName.length > 24 ? fileName.substring(0,24) + '...' : fileName) : "No file selected"}}</p>
             <button (click)="fileUpload.click()"> 
               <i class="fa fa-cloud-upload-alt fa-2x pl-2"></i>
             </button>

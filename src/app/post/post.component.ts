@@ -17,6 +17,7 @@ export class PostComponent implements OnInit {
   safeUrl: SafeResourceUrl = '';
 
   constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
+    setInterval(() => {}, 0);
   }
   
   ngOnInit() {

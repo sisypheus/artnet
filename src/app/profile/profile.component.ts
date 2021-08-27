@@ -29,7 +29,6 @@ export class ProfileComponent implements OnInit {
       else if (selected === 'Posts')
         this.postsService.fetchUserPosts();
       else {
-        console.log('ici');
         this.postsService.getSavedPosts();
       }
     }

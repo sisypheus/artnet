@@ -1,5 +1,5 @@
 <div class="flex items-center justify-center px-1 mb-4">
-  <div class="w-full max-w-md mx-auto border-gray-500 rounded-lg border-2 shadow-lg">
+  <div class="w-full max-w-lg mx-auto border-gray-500 rounded-lg border-2 shadow-lg">
     <div class="flex justify-between items-center">
       <h1 class="text-lg px-4 font-medium">{{ author }}</h1>
 
@@ -16,7 +16,7 @@
     </div>
     
     <!-- file handler -->
-    <div *ngIf="post.file">
+    <div *ngIf="post.file" class="w-full sm:w-full h-108">
       <img *ngIf="post.fileType.includes('image/')" class="object-cover w-full h-96 mt-2 border-black" [src]="post.file" alt="Image of the post" />
       <audio *ngIf="post.fileType.includes('audio/')" class="w-full" onmouseover="this.play()" onmouseout="this.pause()" controls>  
         <source [src]="post.file">
@@ -25,7 +25,7 @@
         <source [src]="post.file">
       </video>
       
-      <embed class="object-cover w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl" type="application/pdf" />
+      <embed class="w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl" type="application/pdf" />
     </div>
 
     <div class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-b-lg">

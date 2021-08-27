@@ -17,6 +17,33 @@ export class PostsService {
       .orderBy('created', 'desc')
       .get()
       .then(async (snapshot: any) => {
+        this.auth.user$.subscribe(async (user) => {
+          if (user) {
+            this.posts = snapshot.docs.map(async (doc: any) => {
+              const postdata = doc.data();
+              postdata.id = doc.id;
+              postdata.liked = await this.isPostLiked(postdata);
+              postdata.saved = await this.isPostSaved(postdata);
+              return { ...postdata};
+            });
+            this.posts = await Promise.all(this.posts).then((posts) => posts);
+          } else {
+            this.posts = snapshot.docs.map((doc: any) => {
+              const postdata = doc.data();
+              postdata.id = doc.id;
+              return { ...postdata};
+            });
+          }
+        });
+      });
+  }
+
+  async fetchAllPostsLogin() {
+    return firebase.firestore()
+      .collectionGroup('userPosts')
+      .orderBy('created', 'desc')
+      .get()
+      .then(async (snapshot: any) => {
             this.posts = snapshot.docs.map(async (doc: any) => {
               const postdata = doc.data();
               postdata.id = doc.id;
@@ -148,13 +175,14 @@ export class PostsService {
   }
 
   async getLikedPosts() {
-    await this.fetchUserPosts();
+    await this.fetchAllPostsLogin();
     this.posts = this.posts.filter((post: any) => post.liked);
   }
 
   async getSavedPosts() {
-    await this.fetchAllPosts();
+    await this.fetchAllPostsLogin();
     this.posts = this.posts.filter((post: any) => post.saved);
+    console.log(this.posts);
   }
 
   deletePost(postId: string) {
