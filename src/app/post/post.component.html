@@ -6,17 +6,18 @@
       <div class="relative">
         <img (click)="setOptions()" class="w-10 h-10 pr-4 pt-1 cursor-pointer" src="../../assets/img/more.svg" />
 
-        <div *ngIf="options" class="border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-28 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
-            <a [routerLink]="['/profile']" class="block px-4 py-2 text-sm text-gray-700"
-              role="menuitem" tabindex="-1" id="user-menu-item-0">Your Profile</a>
-            <a class="block px-4 py-2 text-sm text-gray-700" role="menuitem"
-              tabindex="-1" id="user-menu-item-2">Sign out</a>
+        <div *ngIf="options && postOwner" class="flex items-center justify-center border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+          <div class="flex "(click)="deletePost(); setOptions()">
+            <img class="w-9 h-9 py-1" src="../../assets/img/delete.svg" alt="Delete Icon">  
+            <button class="block px-4 pl-2 py-2 text-sm text-gray-700"
+                role="menuitem" tabindex="-1" id="user-menu-item-0">Delete Post</button>
+            </div>
           </div>
       </div>
     </div>
     
     <!-- file handler -->
-    <div *ngIf="post.file" class="w-full sm:w-full h-108">
+    <div *ngIf="post.file" class="w-full h-108">
       <img *ngIf="post.fileType.includes('image/')" class="object-cover w-full h-96 mt-2 border-black" [src]="post.file" alt="Image of the post" />
       <audio *ngIf="post.fileType.includes('audio/')" class="w-full" onmouseover="this.play()" onmouseout="this.pause()" controls>  
         <source [src]="post.file">
@@ -28,7 +29,7 @@
       <embed class="w-full h-96 mt-2 border-black" *ngIf="post.fileType === 'application/pdf'" [src]="safeUrl" type="application/pdf" />
     </div>
 
-    <div class="flex items-center justify-between px-4 py-2 bg-gray-50 rounded-b-lg">
+    <div class="flex items-center text-center justify-between px-4 py-2 bg-gray-100 rounded-b-lg">
       <h2>{{ post.caption }}</h2>
     </div>
     <div *ngIf="auth.user" class="px-4 py-2 flex justify-between">

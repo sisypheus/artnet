@@ -185,12 +185,15 @@ export class PostsService {
     console.log(this.posts);
   }
 
-  deletePost(postId: string) {
+  deletePost(post: any) {
+    if (post.file)
+      firebase.storage().refFromURL(post.file).delete().catch((err) => {console.log(err);});
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .delete();
+    this.posts = this.posts.filter((object: any) => object.id !== post.id);
   }
 }

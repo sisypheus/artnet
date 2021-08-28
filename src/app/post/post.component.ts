@@ -15,14 +15,22 @@ export class PostComponent implements OnInit {
   author: string = '';
   options: boolean = false;
   safeUrl: SafeResourceUrl = '';
+  postOwner: boolean = false;
 
   constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
-    setInterval(() => {}, 0);
   }
   
   ngOnInit() {
     this.safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(this.post.file);
-    this.uService.getUserFromUid(this.post.creator).then(user => this.author = user);
+    this.uService.getUserFromUid(this.post.creator).then(user => {
+      this.author = user?.displayName;
+      this.auth.user$.subscribe(authuser => {
+        if (authuser) {
+          if (authuser?.uid === user?.uid)
+            this.postOwner = true;
+        }
+      });
+    });
   }
 
   setLike() {
@@ -41,5 +49,9 @@ export class PostComponent implements OnInit {
 
   setOptions() {
     this.options = !this.options;
+  }
+
+  deletePost() {
+    this.postsService.deletePost(this.post);
   }
 }

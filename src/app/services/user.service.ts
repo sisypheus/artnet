@@ -9,10 +9,10 @@ export class UserService {
 
   constructor(private auth: AuthService) { }
 
-  async getUserFromUid(uid: string): Promise<string> {
+  async getUserFromUid(uid: string): Promise<any> {
     return this.auth.afs.doc('users/' + uid).get().toPromise().then(
       (doc: any) => {
-        return doc.data()?.displayName;
+        return doc.data();
       }
     ).catch(
       (error) => 'undefined'
