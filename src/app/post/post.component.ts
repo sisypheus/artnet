@@ -4,6 +4,7 @@ import { UserService } from '../services/user.service';
 import firebase from 'firebase/app';
 import { PostsService } from '../services/posts.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-post',
@@ -16,9 +17,10 @@ export class PostComponent implements OnInit {
   options: boolean = false;
   safeUrl: SafeResourceUrl = '';
   postOwner: boolean = false;
-  commenting: boolean = true;
+  canComment: boolean = false;
+  comment: string = '';
 
-  constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
+  constructor(private router: Router, private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
   }
   
   ngOnInit() {
@@ -32,6 +34,27 @@ export class PostComponent implements OnInit {
         }
       });
     });
+    if (this.post.comments) {
+      this.post.comments.forEach((comment:any) => {
+        this.uService.getUserFromUid(comment.creator).then(user => {
+          comment.author = user?.displayName;
+        });
+      });
+    }
+  }
+
+  needAuth() {
+    this.router.navigate(['/auth']);
+  }
+
+  addComment() {
+    this.postsService.addComment(this.post, this.comment);
+    this.post.comments.push({
+      content: this.comment,
+      creator: this.auth.user?.uid,
+      author: this.auth.user?.displayName,
+    });
+    this.comment = '';
   }
 
   setLike() {
@@ -54,9 +77,5 @@ export class PostComponent implements OnInit {
 
   deletePost() {
     this.postsService.deletePost(this.post);
-  }
-
-  setCommentMode() {
-    this.commenting = !this.commenting;
   }
 }

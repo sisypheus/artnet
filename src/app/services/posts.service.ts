@@ -28,13 +28,16 @@ export class PostsService {
               return { ...postdata};
             });
             this.posts = await Promise.all(this.posts).then((posts) => posts);
-            console.log(this.posts);
           } else {
-            this.posts = snapshot.docs.map((doc: any) => {
+            this.posts = snapshot.docs.map(async (doc: any) => {
               const postdata = doc.data();
               postdata.id = doc.id;
+              postdata.liked = false;
+              postdata.saved = false;
+              postdata.comments = await this.getFirstComments(postdata);
               return { ...postdata};
             });
+            this.posts = await Promise.all(this.posts).then((posts) => posts);
           }
         });
       });
@@ -187,6 +190,21 @@ export class PostsService {
     console.log(this.posts);
   }
 
+  addComment(post: any, comment: string) {
+    const toAdd = {
+      content: comment,
+      created: firebase.firestore.FieldValue.serverTimestamp(),
+      creator: this.auth.user?.uid,
+    }
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .add(toAdd);
+  }
+
   async getFirstComments(post: any) {
     const comments = await firebase.firestore()
       .collection('posts')
@@ -194,10 +212,10 @@ export class PostsService {
       .collection('userPosts')
       .doc(post?.id)
       .collection('comments')
+      .orderBy('created', 'desc')
       .get()
       .then((querySnapshot) => {
         const comments = querySnapshot.docs.map((doc) => {
-          console.log(doc.data());
           const comment = doc.data();
           comment.id = doc.id;
           return {...comment};
