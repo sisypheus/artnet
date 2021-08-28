@@ -16,6 +16,7 @@ export class PostComponent implements OnInit {
   options: boolean = false;
   safeUrl: SafeResourceUrl = '';
   postOwner: boolean = false;
+  commenting: boolean = true;
 
   constructor( private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
   }
@@ -53,5 +54,9 @@ export class PostComponent implements OnInit {
 
   deletePost() {
     this.postsService.deletePost(this.post);
+  }
+
+  setCommentMode() {
+    this.commenting = !this.commenting;
   }
 }

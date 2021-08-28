@@ -9,7 +9,7 @@
         <div *ngIf="options && postOwner" class="flex items-center justify-center border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div class="flex "(click)="deletePost(); setOptions()">
             <img class="w-9 h-9 py-1" src="../../assets/img/delete.svg" alt="Delete Icon">  
-            <button class="block px-4 pl-2 py-2 text-sm text-gray-700"
+            <button class="block px-4 pl-1 py-2 text-base text-gray-700"
                 role="menuitem" tabindex="-1" id="user-menu-item-0">Delete Post</button>
             </div>
           </div>
@@ -43,13 +43,26 @@
         </div>
   
         <!-- comment -->
-        <svg class="cursor-pointer" fill="#262626" height="24" role="img" viewBox="0 0 48 48" width="24"><path clip-rule="evenodd" d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z" fill-rule="evenodd"></path></svg>
+        <svg class="cursor-pointer" (click)="setCommentMode()" fill="#262626" height="24" role="img" viewBox="0 0 48 48" width="24"><path clip-rule="evenodd" d="M47.5 46.1l-2.8-11c1.8-3.3 2.8-7.1 2.8-11.1C47.5 11 37 .5 24 .5S.5 11 .5 24 11 47.5 24 47.5c4 0 7.8-1 11.1-2.8l11 2.8c.8.2 1.6-.6 1.4-1.4zm-3-22.1c0 4-1 7-2.6 10-.2.4-.3.9-.2 1.4l2.1 8.4-8.3-2.1c-.5-.1-1-.1-1.4.2-1.8 1-5.2 2.6-10 2.6-11.4 0-20.6-9.2-20.6-20.5S12.7 3.5 24 3.5 44.5 12.7 44.5 24z" fill-rule="evenodd"></path></svg>
       </div>
 
       <!-- save -->
       <div *ngIf="post" (click)="setSave()" class="cursor-pointer">
         <svg *ngIf="post.saved" fill="#262626" height="24" role="img" viewBox="0 0 48 48" width="24"><path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 28.9 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1z"></path></svg>
         <svg *ngIf="!post.saved" fill="#262626" height="24" role="img" viewBox="0 0 48 48" width="24"><path d="M43.5 48c-.4 0-.8-.2-1.1-.4L24 29 5.6 47.6c-.4.4-1.1.6-1.6.3-.6-.2-1-.8-1-1.4v-45C3 .7 3.7 0 4.5 0h39c.8 0 1.5.7 1.5 1.5v45c0 .6-.4 1.2-.9 1.4-.2.1-.4.1-.6.1zM24 26c.8 0 1.6.3 2.2.9l15.8 16V3H6v39.9l15.8-16c.6-.6 1.4-.9 2.2-.9z"></path></svg>
+      </div>
+    </div>
+
+    <!-- comments and comment section -->
+    <div *ngIf="commenting" class="px-4 pb-2">
+      <!-- ngFor post.comments  -->
+      <div class="flex space-x-3">
+        <p class="text-bold font-bold">
+          {{ post?.comments[0]?.creator }}
+        </p>
+        <p class="font-normal">
+          {{ post?.comments[0]?.content }}
+        </p>
       </div>
     </div>
   </div>

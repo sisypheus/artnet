@@ -44,7 +44,8 @@ export class HomeComponent implements OnInit {
         .add({
           caption: caption,
           created: firebase.firestore.FieldValue.serverTimestamp(),
-          creator: this.auth.user?.uid
+          creator: this.auth.user?.uid,
+          likes: 0,
         }).finally(() => {
           this.postsService.fetchAllPosts();
         });
@@ -61,6 +62,7 @@ export class HomeComponent implements OnInit {
             file: url,
             fileType: metadata,
             created: firebase.firestore.FieldValue.serverTimestamp(),
+            likes: 0,
             creator: this.auth.user?.uid,
           }).finally(() => {
             this.postsService.fetchAllPosts();

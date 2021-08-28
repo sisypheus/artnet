@@ -24,9 +24,11 @@ export class PostsService {
               postdata.id = doc.id;
               postdata.liked = await this.isPostLiked(postdata);
               postdata.saved = await this.isPostSaved(postdata);
+              postdata.comments = await this.getFirstComments(postdata);
               return { ...postdata};
             });
             this.posts = await Promise.all(this.posts).then((posts) => posts);
+            console.log(this.posts);
           } else {
             this.posts = snapshot.docs.map((doc: any) => {
               const postdata = doc.data();
@@ -185,9 +187,64 @@ export class PostsService {
     console.log(this.posts);
   }
 
+  async getFirstComments(post: any) {
+    const comments = await firebase.firestore()
+      .collection('posts')
+      .doc(post?.creator)
+      .collection('userPosts')
+      .doc(post?.id)
+      .collection('comments')
+      .get()
+      .then((querySnapshot) => {
+        const comments = querySnapshot.docs.map((doc) => {
+          console.log(doc.data());
+          const comment = doc.data();
+          comment.id = doc.id;
+          return {...comment};
+        });
+        return comments;
+      });
+      return comments;
+  }
+
+  async getAllComments(post: any) {
+    return firebase.firestore()
+      .collection('posts')
+      .doc(post?.creator)
+      .collection('userPosts')
+      .doc(post?.id)
+      .collection('comments')
+      .orderBy('created', 'desc')
+      .get()
+      .then((querySnapshot) => {
+        let comments = querySnapshot.docs.map((doc) => {
+          const comment = doc.data();
+          comment.id = doc.id;
+          return {...comment};
+        });
+        return comments;
+      });
+  }
+
   deletePost(post: any) {
     if (post.file)
       firebase.storage().refFromURL(post.file).delete().catch((err) => {console.log(err);});
+    //delete first the subcollections of the post
+    const collection = ['likes', 'comments', 'saved'];
+    for (let i = 0; i < 3; i++) {
+      firebase.firestore()
+      .collection('posts')
+      .doc(this.auth.user?.uid)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection(collection[i])
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          doc.ref.delete();
+        });
+      });
+    }
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
