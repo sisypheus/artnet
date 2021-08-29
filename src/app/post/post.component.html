@@ -63,6 +63,23 @@
           {{ comment.content }}
         </p>
       </div>
+
+      <!-- separator between comment and reply -->
+      <div class="flex items-center space-x-2">
+        <div class="w-8 border-b-2 justify-self-start border-gray-300"></div>
+        <p class="text-gray-400">Replies</p>
+      </div>
+
+      <div *ngFor="let reply of comment.replies" class="pl-10">
+        <div class="flex space-x-3">
+          <p class="text-bold font-bold">
+            {{ reply.creator }}
+          </p>
+          <p class="">
+            {{ reply.content }}
+          </p>
+        </div>
+      </div>
     </div>
     <section class="flex w-full border-t-2 border-gray-300 px-2 py-1">
       <div class="w-full flex ">
