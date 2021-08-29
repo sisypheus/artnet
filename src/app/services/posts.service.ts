@@ -102,7 +102,7 @@ export class PostsService {
   async isPostSaved(post: any) {
     const exists = firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .collection('saved')
@@ -114,7 +114,25 @@ export class PostsService {
     return await exists;
   }
 
+  async isCommentLiked(post: any, comment: any) {
+    const exists = firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('likes')
+      .doc(this.auth.user?.uid)
+      .get()
+      .then((doc) => {
+        return doc.exists;
+      });
+    return await exists;
+  }
+
   savePost(postId: string) {
+    //to do change user uid
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
@@ -128,6 +146,7 @@ export class PostsService {
   }
 
   unsavePost(postId: string) {
+    //todo change user uid
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
@@ -141,6 +160,7 @@ export class PostsService {
   }
 
   likePost(postId: string) {
+    //todo change
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
@@ -161,6 +181,7 @@ export class PostsService {
   }
 
   unlikePost(postId: string) {
+    //todo change user uid
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
@@ -248,9 +269,10 @@ export class PostsService {
           const comment = doc.data();
           comment.id = doc.id;
           comment.replies = await this.getFirstReply(post, doc.id);
-          console.log(comment.replies);
+          comment.liked = await this.isCommentLiked(post, comment);
           return { ...comment };
         }));
+        console.log(comments);
         return comments;
       });
     return comments;
@@ -315,6 +337,52 @@ export class PostsService {
         return replies;
       });
     return replies;
+  }
+
+  unlikeComment(post: any, comment: any) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('likes')
+      .doc(this.auth.user?.uid)
+      .delete();
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .update({ nblikes: firebase.firestore.FieldValue.increment(-1) });
+    comment.liked = false;
+    comment.nblikes -= 1;
+  }
+
+  likeComment(post: any, comment: any) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('likes')
+      .doc(this.auth.user?.uid)
+      .set({});
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .update({ nblikes: firebase.firestore.FieldValue.increment(1) });
+    comment.liked = true;
+    comment.nblikes += 1;
   }
 
   deletePost(post: any) {

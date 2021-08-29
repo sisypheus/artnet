@@ -78,4 +78,19 @@ export class PostComponent implements OnInit {
   deletePost() {
     this.postsService.deletePost(this.post);
   }
+
+  //comment utilities
+  setCommentLike(comment: any) {
+    if (comment.liked)
+      this.postsService.unlikeComment(this.post, comment);
+    else
+      this.postsService.likeComment(this.post, comment);
+  }
+
+  setCommentReplyLike(comment: any, reply: any) {
+    // if (reply.liked)
+    //   this.postsService.unlikeReply(this.post.id, comment, reply);
+    // else
+    //   this.postsService.likeReply(this.post.id, comment, reply);
+  }
 }
