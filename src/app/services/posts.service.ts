@@ -87,7 +87,7 @@ export class PostsService {
   async isPostLiked(post: any) {
     const exists = firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .collection('likes')
@@ -131,41 +131,36 @@ export class PostsService {
     return await exists;
   }
 
-  savePost(postId: string) {
-    //to do change user uid
+  savePost(post: any) {
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .collection('saved')
       .doc(this.auth.user?.uid)
       .set({});
-    let post = this.posts.find((post: any) => post.id === postId);
     post.saved = true;
   }
 
-  unsavePost(postId: string) {
-    //todo change user uid
+  unsavePost(post: any) {
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .collection('saved')
       .doc(this.auth.user?.uid)
       .delete();
-    let post = this.posts.find((post: any) => post.id === postId);
     post.saved = false;
   }
 
-  likePost(postId: string) {
-    //todo change
+  likePost(post: any) {
     firebase.firestore()
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .collection('likes')
       .doc(this.auth.user?.uid)
       .set({});
@@ -173,20 +168,18 @@ export class PostsService {
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .update({ likes: firebase.firestore.FieldValue.increment(1) });
-    let post = this.posts.find((post: any) => post.id === postId);
     post.liked = true;
     post.likes += 1;
   }
 
-  unlikePost(postId: string) {
-    //todo change user uid
+  unlikePost(post: any) {
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .collection('likes')
       .doc(this.auth.user?.uid)
       .delete();
@@ -194,9 +187,8 @@ export class PostsService {
       .collection('posts')
       .doc(this.auth.user?.uid)
       .collection('userPosts')
-      .doc(postId)
+      .doc(post.id)
       .update({ likes: firebase.firestore.FieldValue.increment(-1) });
-    let post = this.posts.find((post: any) => post.id === postId);
     post.liked = false;
     post.likes -= 1;
   }

@@ -59,16 +59,16 @@ export class PostComponent implements OnInit {
 
   setLike() {
     if (this.post.liked)
-      this.postsService.unlikePost(this.post.id);
+      this.postsService.unlikePost(this.post);
     else
-      this.postsService.likePost(this.post.id);
+      this.postsService.likePost(this.post);
   }
 
   setSave() {
     if (this.post.saved)
-      this.postsService.unsavePost(this.post.id);
+      this.postsService.unsavePost(this.post);
     else
-      this.postsService.savePost(this.post.id);
+      this.postsService.savePost(this.post);
   }
 
   setOptions() {
