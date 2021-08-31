@@ -277,6 +277,27 @@ export class PostsService {
     post.nbReplies += 1;
   }
 
+  deleteReply(post: any, comment: any, reply: any) {
+    const document = firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+
+    document.collection('likes')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          doc.ref.delete();
+        });
+      });
+    document.delete();
+  }
+
   deleteComment(post: any, comment: any) {
     //deleting all subcollections of this comment
     firebase.firestore()
@@ -484,6 +505,60 @@ export class PostsService {
       .update({ nblikes: firebase.firestore.FieldValue.increment(1) });
     comment.liked = true;
     comment.nblikes += 1;
+  }
+
+  likeReply(post: any, comment: any, reply: any) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+      .collection('likes')
+      .doc(this.auth.user?.uid)
+      .set({});
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+      .update({ nblikes: firebase.firestore.FieldValue.increment(1) });
+    reply.liked = true;
+    reply.nblikes += 1;
+  }
+
+  unlikeReply(post: any, comment: any, reply: any) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+      .collection('likes')
+      .doc(this.auth.user?.uid)
+      .delete();
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+      .update({ nblikes: firebase.firestore.FieldValue.increment(-1) });
+    reply.liked = false;
+    reply.nblikes -= 1;
   }
 
   deletePost(post: any) {

@@ -60,6 +60,14 @@ export class PostComponent implements OnInit {
     }
   }
 
+  setAllReplyOptions(comment: any) {
+    if (comment.replies) {
+      comment.replies.forEach((reply:any) => {
+        reply.options = false;
+      });
+    }
+  }
+
   setCommentOptions(comment: any, state: boolean) {
     this.setAllCommentOptions();
     comment.options = !state;
@@ -98,6 +106,10 @@ export class PostComponent implements OnInit {
 
   //comment utilities
   setCommentLike(comment: any) {
+    if (!this.auth.user) {
+      this.router.navigate(['/auth']);
+      return;
+    }
     if (comment.liked)
       this.postsService.unlikeComment(this.post, comment);
     else
@@ -112,16 +124,29 @@ export class PostComponent implements OnInit {
     this.replying = comment;
   }
 
+  setReplyOptions(reply: any, state: boolean) {
+    this.setAllReplyOptions(reply);
+    reply.options = !state;
+  }
+
+  setReplyLike(comment: any, reply: any) {
+    if (!this.auth.user) {
+      this.router.navigate(['/auth']);
+      return;
+    }
+    if (reply.liked)
+      this.postsService.unlikeReply(this.post, comment, reply);
+    else
+      this.postsService.likeReply(this.post, comment, reply);
+  }
+
+  deleteReply(comment:any, reply: any) {
+    this.postsService.deleteReply(this.post, comment, reply);
+  }
+
   addReply() {
     this.postsService.addReply(this.post, this.replying, this.comment);
     this.comment = '';
     this.replying = null;
-  }
-
-  setCommentReplyLike(comment: any, reply: any) {
-    // if (reply.liked)
-    //   this.postsService.unlikeReply(this.post.id, comment, reply);
-    // else
-    //   this.postsService.likeReply(this.post.id, comment, reply);
   }
 }
