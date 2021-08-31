@@ -72,13 +72,21 @@
             <div class="relative">
               <img *ngIf="auth.user" (click)="setCommentOptions(comment, comment.options)" class="w-10 h-10 pr-4 cursor-pointer" src="../../assets/img/more.svg" />
             
-              <div *ngIf="comment.options" class="block justify-center border-2 border-black cursor-pointer origin-top-right absolute top-0 mt-8 -ml-24 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+              <div *ngIf="comment.options" class="z-10 block justify-center border-2 border-black cursor-pointer origin-top-right absolute top-0 mt-8 -ml-24 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                 <div class="flex">
                   <img class="w-8 h-8 py-1 pl-1" src="../../assets/img/reply.svg" alt="Reply Icon">
                   <button (click)="setCommentOptions(comment, true); setReply(comment)" class="block p-2 text-base text-gray-700">
                     Reply
                   </button>
                 </div>
+
+                <div class="flex" *ngIf="comment.creator === auth.user?.uid" (click)="setEdit(comment)">
+                  <img class="w-8 h-8 py-1 pl-1" src="../../assets/img/edit.svg" alt="Edit Icon">
+                  <button (click)="setCommentOptions(comment, true); setEdit(comment)" class="block p-2 text-base text-gray-700">
+                    Edit Comment
+                  </button>
+                </div>
+
                 <div class="flex" *ngIf="comment.creator === auth.user?.uid" (click)="deleteComment(comment)">
                   <img class="w-9 h-9 py-1" src="../../assets/img/delete.svg" alt="Delete Icon">  
                   <button class="block px-1 pl-1 py-2 text-base text-gray-700">
@@ -104,26 +112,33 @@
         <p class="text-gray-400">Replies</p>
       </div>
 
+      <!-- reply section -->
       <div *ngFor="let reply of comment.replies" class="pl-10">
         <div class="flex justify-between items-center">
           <div class="flex space-x-3">
             <p class="text-bold font-bold">
               {{ reply.creatorDisplayName ? reply.creatorDisplayName : reply.author }}
             </p>
-            <p class="">
+            <p>
               {{ reply.content }}
             </p>
           </div>
           <div>
             <div class="flex items-center">
               <div *ngIf="reply.creator === auth.user?.uid" class="relative">
-                <img (click)="setReplyOptions(reply, reply.options)" class="w-10 h-10 pr-4 cursor-pointer" src="../../assets/img/more.svg" />
+                <img (click)="setReplyOptions(reply, reply.options)" class="z-0 w-10 h-10 pr-4 cursor-pointer" src="../../assets/img/more.svg" />
               
-                <div *ngIf="reply.options && reply.creator === auth.user?.uid" class="block justify-center border-2 border-black cursor-pointer origin-top-right absolute top-0 mt-8 -ml-24 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+                <div *ngIf="reply.options && reply.creator === auth.user?.uid" class="z-10 block justify-center border-2 border-black cursor-pointer origin-top-right absolute top-0 mt-8 -ml-24 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
                   <div class="flex" (click)="deleteReply(comment, reply)">
                     <img class="w-9 h-9 py-1" src="../../assets/img/delete.svg" alt="Delete Icon">  
                     <button class="block px-1 pl-1 py-2 text-base text-gray-700">
                       Delete Reply
+                    </button>
+                  </div>
+                  <div class="flex" (click)="setReplyEdit(comment, reply); setReplyOptions(reply, reply.options)">
+                    <img class="w-8 h-8 py-1 pl-1" src="../../assets/img/edit.svg" alt="Edit Icon">
+                    <button class="block px-1 pl-2 py-2 text-base text-gray-700">
+                      Edit Reply
                     </button>
                   </div>
                 </div>
@@ -141,19 +156,31 @@
           </div>
         </div>
       </div>
+
+      <!-- load all replies from a comment -->
+      <div *ngIf="comment.nbReplies && comment.nbReplies > 1" class="pl-10 cursor-pointer">
+        <p (click)="loadAllReplies(comment)" class="text-gray-400 hover:text-gray-500 hover:underline">Load all replies</p>
+      </div>
     </div>
     <section class="flex w-full border-t-2 border-gray-300 px-2 py-1">
       <div class="w-full flex ">
         <div class="w-full flex">
-          <input #commentInput (focus)="auth.user ? null : needAuth()" [(ngModel)]="comment" class="pl-2 w-full text-lg rounded-lg focus:outline-none" [placeholder]="replying ? 'Reply:' : 'Add a comment...'">
-          <img *ngIf="replying" (click)="setReply(null)" title="Delete reply" class="w-8 h-8 cursor-pointer mr-2" src="../../assets/img/delete.svg" alt="">
+          <input #commentInput (focus)="auth.user ? null : needAuth()" [(ngModel)]="comment" class="pl-2 w-full text-lg rounded-lg focus:outline-none" [placeholder]="action + ':'">
+          <img *ngIf="replying && action === 'Replying'" (click)="setReply(null); resetInput()" title="Delete Reply" class="w-8 h-8 cursor-pointer mr-2" src="../../assets/img/delete.svg" alt="">
+          <img *ngIf="editing && action === 'Editing'" (click)="setEdit(null); resetInput()" title="Delete Edit" class="w-8 h-8 cursor-pointer mr-2" src="../../assets/img/delete.svg" alt="">
         </div>
-        <!-- comment or reply button -->
-        <div *ngIf="!replying">
+        <!-- comment -->
+        <div *ngIf="action === 'Commenting'">
           <button (click)="addComment()" *ngIf="comment.length" class="p-1 text-center text-lg text-blue-600 font-semibold">Comment</button>
           <button *ngIf="!comment.length" class="cursor-default font-semibold p-1 text-center text-lg text-blue-200">Comment</button>
         </div>
-        <div *ngIf="replying">
+        <!-- edit -->
+        <div *ngIf="action === 'Editing'">
+          <button (click)="replyEdit ? editReply() : editComment()" *ngIf="comment.length" class="p-1 text-center text-lg text-blue-600 font-semibold">Edit</button>
+          <button *ngIf="!comment.length" class="cursor-default font-semibold p-1 text-center text-lg text-blue-200">Edit</button>
+        </div>
+        <!-- reply -->
+        <div *ngIf="action === 'Replying'">
           <button (click)="addReply()" *ngIf="comment.length" class="p-1 text-center text-lg text-blue-600 font-semibold">Reply</button>
           <button *ngIf="!comment.length" class="cursor-default font-semibold p-1 text-center text-lg text-blue-200">Reply</button>
         </div>

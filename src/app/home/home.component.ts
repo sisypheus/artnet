@@ -46,6 +46,7 @@ export class HomeComponent implements OnInit {
           created: firebase.firestore.FieldValue.serverTimestamp(),
           creator: this.auth.user?.uid,
           likes: 0,
+          nbComments: 0,
         }).finally(() => {
           this.postsService.fetchAllPosts();
         });
@@ -64,6 +65,7 @@ export class HomeComponent implements OnInit {
             created: firebase.firestore.FieldValue.serverTimestamp(),
             likes: 0,
             creator: this.auth.user?.uid,
+            nbComments: 0,
           }).finally(() => {
             this.postsService.fetchAllPosts();
           });

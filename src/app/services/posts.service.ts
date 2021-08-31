@@ -296,26 +296,11 @@ export class PostsService {
         });
       });
     document.delete();
+    comment.replies = comment.replies.filter((reply: any) => reply.id !== reply.id);
   }
 
   deleteComment(post: any, comment: any) {
     //deleting all subcollections of this comment
-    firebase.firestore()
-      .collection('posts')
-      .doc(post.creator)
-      .collection('userPosts')
-      .doc(post.id)
-      .collection('comments')
-      .doc(comment.id)
-      .collection('likes')
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.forEach((doc) => {
-          console.log(doc.id);
-          doc.ref.delete();
-        });
-      });
-
     firebase.firestore()
       .collection('posts')
       .doc(post.creator)
@@ -328,27 +313,31 @@ export class PostsService {
       .then((querySnapshot) => {
         querySnapshot.docs.map((doc) => {
           //deleting all likes of each reply
-          firebase.firestore()
-            .collection('posts')
-            .doc(post.creator)
-            .collection('userPosts')
-            .doc(post.id)
-            .collection('comments')
-            .doc(comment.id)
-            .collection('replies')
-            .doc(doc.id)
+          doc.ref
             .collection('likes')
             .get()
             .then((querySnapshot) => {
-              //deleting all likes for this reply
               querySnapshot.forEach((doc) => {
                 doc.ref.delete();
               });
             });
-          //delete each reply
           doc.ref.delete();
         });
-      })
+      });
+
+    //deleting all likes record of this comment
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('likes')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.docs.forEach((doc) => {
+          doc.ref.delete();
+        });
+      });
 
     //delete the post document
     firebase.firestore()
@@ -363,12 +352,15 @@ export class PostsService {
         doc.ref.delete();
       });
     //update number of comments of post
-    firebase.firestore()
+      firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
-      .update({ nbComments: firebase.firestore.FieldValue.increment(-1) });
+      .update({ nbComments: firebase.firestore.FieldValue.increment(-1) })
+      .catch(() => {
+        // The document doesn't exist but we know it.
+      });
     //remove the comment from the post variable
     post.comments = post.comments.filter((c: any) => c.id !== comment.id);
     post.nbComments -= 1;
@@ -381,7 +373,7 @@ export class PostsService {
       .collection('userPosts')
       .doc(post?.id)
       .collection('comments')
-      .orderBy('created', 'desc')
+      .orderBy('created', 'asc')
       .get()
       .then(async (querySnapshot) => {
         const comments = await Promise.all(querySnapshot.docs.map(async (doc) => {
@@ -459,6 +451,33 @@ export class PostsService {
         return replies;
       });
     return replies;
+  }
+
+  editComment(post: any, comment: any, newComment: string) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .update({ content: newComment });
+    comment.content = newComment;
+  }
+
+  editReply(post: any, comment: any, reply: any, newReply: string) {
+    console.log(post, comment, reply, newReply);
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .doc(reply.id)
+      .update({ content: newReply });
+    reply.content = newReply;
   }
 
   unlikeComment(post: any, comment: any) {
@@ -576,7 +595,9 @@ export class PostsService {
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
-            //TODO delete each comment of each post
+            if (collection[i] === 'comments') {
+              this.deleteComment(post, { ...doc.data(), id: doc.id });
+            }
             doc.ref.delete();
           });
         });

@@ -17,7 +17,11 @@ export class PostComponent implements OnInit {
   options: boolean = false;
   safeUrl: SafeResourceUrl = '';
   postOwner: boolean = false;
+  action: 'Editing' | 'Replying' | 'Commenting' = 'Commenting';
+  replyEdit: any = null;
+  commentReply: any = null;
   replying: any = null;
+  editing: any = null;
   comment: string = '';
 
   constructor(private router: Router, private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
@@ -121,7 +125,26 @@ export class PostComponent implements OnInit {
   }
 
   setReply(comment: any) {
+    if (!comment) {
+      this.replying = null;
+      this.action = 'Commenting';
+      return;
+    }
+    this.action = 'Replying';
+    this.editing = null;
     this.replying = comment;
+  }
+
+  setEdit(comment: any) {
+    if (!comment) {
+      this.editing = null;
+      this.action = 'Commenting';
+      return;
+    }
+    this.action = 'Editing';
+    this.editing = comment;
+    this.replying = null;
+    this.comment = comment.content;
   }
 
   setReplyOptions(reply: any, state: boolean) {
@@ -148,5 +171,52 @@ export class PostComponent implements OnInit {
     this.postsService.addReply(this.post, this.replying, this.comment);
     this.comment = '';
     this.replying = null;
+    this.action = 'Commenting';
+  }
+
+  async loadAllReplies(comment: any) {
+    const replies = await this.postsService.getAllReplies(this.post, comment.id);
+    replies.forEach((reply:any) => {
+      this.uService.getUserFromUid(reply.creator).then(user => {
+        reply.author = user?.displayName;
+      });
+    })
+    comment.replies = replies;
+  }
+
+  editComment() {
+    this.postsService.editComment(this.post, this.editing, this.comment);
+    this.action = 'Commenting';
+    this.editing = null;
+    this.replying = null;
+    this.comment = '';
+  }
+
+  setReplyEdit(comment: any, reply: any) {
+    if (!reply) {
+      this.replyEdit = false;
+      this.editing = null;
+      this.action = 'Commenting';
+      this.commentReply = null;
+      return;
+    }
+    this.commentReply = comment;
+    this.replyEdit = true;
+    this.action = 'Editing';
+    this.editing = reply;
+    this.comment = reply.content;
+  }
+
+  editReply() {
+    this.postsService.editReply(this.post, this.commentReply, this.editing, this.comment);
+    this.action = 'Commenting';
+    this.editing = null;
+    this.replying = null;
+    this.comment = '';
+    this.commentReply = null;
+  }
+
+  resetInput() {
+    this.comment = '';
   }
 }
