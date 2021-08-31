@@ -17,7 +17,7 @@ export class PostComponent implements OnInit {
   options: boolean = false;
   safeUrl: SafeResourceUrl = '';
   postOwner: boolean = false;
-  canComment: boolean = false;
+  replying: any = null;
   comment: string = '';
 
   constructor(private router: Router, private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
@@ -35,10 +35,18 @@ export class PostComponent implements OnInit {
       });
     });
     if (this.post.comments) {
+      //setting real name from uid for each comment
       this.post.comments.forEach((comment:any) => {
         comment.options = false;
         this.uService.getUserFromUid(comment.creator).then(user => {
           comment.author = user?.displayName;
+        });
+        //setting real name from uid for each reply
+        comment.replies.forEach((reply:any) => {
+          comment.options = false;
+          this.uService.getUserFromUid(reply.creator).then(user => {
+            reply.author = user?.displayName;
+          });
         });
       });
     }
@@ -97,8 +105,17 @@ export class PostComponent implements OnInit {
   }
 
   deleteComment(comment: any) {
-    console.log('ici');
     this.postsService.deleteComment(this.post, comment);
+  }
+
+  setReply(comment: any) {
+    this.replying = comment;
+  }
+
+  addReply() {
+    this.postsService.addReply(this.post, this.replying, this.comment);
+    this.comment = '';
+    this.replying = null;
   }
 
   setCommentReplyLike(comment: any, reply: any) {

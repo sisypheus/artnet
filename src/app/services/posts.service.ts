@@ -211,6 +211,7 @@ export class PostsService {
       created: firebase.firestore.FieldValue.serverTimestamp(),
       creator: this.auth.user?.uid,
       creatorDisplayName: this.auth.user?.displayName,
+      replies: [],
       nblikes: 0,
     }
     const docRef = firebase.firestore()
@@ -236,6 +237,44 @@ export class PostsService {
       .doc(post.id)
       .update({ nbComments: firebase.firestore.FieldValue.increment(1) });
     post.nbComments += 1;
+  }
+
+  addReply(post: any, comment: any, reply: string) {
+    let toAdd = {
+      id: '', 
+      content: reply,
+      created: firebase.firestore.FieldValue.serverTimestamp(),
+      creator: this.auth.user?.uid,
+      creatorDisplayName: this.auth.user?.displayName,
+      nblikes: 0,
+    }
+    const docRef = firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .add({
+        content: toAdd.content,
+        created: toAdd.created,
+        creator: toAdd.creator,
+        nblikes: 0,
+      });
+    docRef.then((doc) => {
+      toAdd.id = doc.id;
+      comment.replies.push({ ...toAdd });
+    });
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .update({ nbReplies: firebase.firestore.FieldValue.increment(1) });
+    post.nbReplies += 1;
   }
 
   deleteComment(post: any, comment: any) {
