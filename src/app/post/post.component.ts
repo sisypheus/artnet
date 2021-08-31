@@ -36,11 +36,25 @@ export class PostComponent implements OnInit {
     });
     if (this.post.comments) {
       this.post.comments.forEach((comment:any) => {
+        comment.options = false;
         this.uService.getUserFromUid(comment.creator).then(user => {
           comment.author = user?.displayName;
         });
       });
     }
+  }
+
+  setAllCommentOptions() {
+    if (this.post.comments) {
+      this.post.comments.forEach((comment:any) => {
+        comment.options = false;
+      });
+    }
+  }
+
+  setCommentOptions(comment: any, state: boolean) {
+    this.setAllCommentOptions();
+    comment.options = !state;
   }
 
   needAuth() {
@@ -49,11 +63,6 @@ export class PostComponent implements OnInit {
 
   addComment() {
     this.postsService.addComment(this.post, this.comment);
-    this.post.comments.push({
-      content: this.comment,
-      creator: this.auth.user?.uid,
-      author: this.auth.user?.displayName,
-    });
     this.comment = '';
   }
 
@@ -85,6 +94,11 @@ export class PostComponent implements OnInit {
       this.postsService.unlikeComment(this.post, comment);
     else
       this.postsService.likeComment(this.post, comment);
+  }
+
+  deleteComment(comment: any) {
+    console.log('ici');
+    this.postsService.deleteComment(this.post, comment);
   }
 
   setCommentReplyLike(comment: any, reply: any) {

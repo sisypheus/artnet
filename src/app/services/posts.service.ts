@@ -205,32 +205,41 @@ export class PostsService {
   }
 
   addComment(post: any, comment: string) {
-    const toAdd = {
+    let toAdd = {
+      id: '', 
       content: comment,
       created: firebase.firestore.FieldValue.serverTimestamp(),
       creator: this.auth.user?.uid,
+      creatorDisplayName: this.auth.user?.displayName,
+      nblikes: 0,
     }
-    firebase.firestore()
+    const docRef = firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .collection('comments')
-      .add(toAdd);
+      .add({
+        content: toAdd.content,
+        created: toAdd.created,
+        creator: toAdd.creator,
+        nblikes: 0,
+      });
+    docRef.then((doc) => {
+      toAdd.id = doc.id;
+      post.comments.push({ ...toAdd });
+    });
     firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .update({ nbComments: firebase.firestore.FieldValue.increment(1) });
+    post.nbComments += 1;
   }
 
   deleteComment(post: any, comment: any) {
     //deleting all subcollections of this comment
-    /*const collections = ['likes', 'replies'];
-    for (let i = 0; collections[i]; i++) {
-
-    }
     firebase.firestore()
       .collection('posts')
       .doc(post.creator)
@@ -238,13 +247,71 @@ export class PostsService {
       .doc(post.id)
       .collection('comments')
       .doc(comment.id)
+      .collection('likes')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+          console.log(doc.id);
+          doc.ref.delete();
+        });
+      });
 
     firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
-      .update({ nbComments: firebase.firestore.FieldValue.increment(-1) });*/
+      .collection('comments')
+      .doc(comment.id)
+      .collection('replies')
+      .get()
+      .then((querySnapshot) => {
+        querySnapshot.docs.map((doc) => {
+          //deleting all likes of each reply
+          firebase.firestore()
+            .collection('posts')
+            .doc(post.creator)
+            .collection('userPosts')
+            .doc(post.id)
+            .collection('comments')
+            .doc(comment.id)
+            .collection('replies')
+            .doc(doc.id)
+            .collection('likes')
+            .get()
+            .then((querySnapshot) => {
+              //deleting all likes for this reply
+              querySnapshot.forEach((doc) => {
+                doc.ref.delete();
+              });
+            });
+          //delete each reply
+          doc.ref.delete();
+        });
+      })
+
+    //delete the post document
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .collection('comments')
+      .doc(comment.id)
+      .get()
+      .then((doc) => {
+        doc.ref.delete();
+      });
+    //update number of comments of post
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .update({ nbComments: firebase.firestore.FieldValue.increment(-1) });
+    //remove the comment from the post variable
+    post.comments = post.comments.filter((c: any) => c.id !== comment.id);
+    post.nbComments -= 1;
   }
 
   async getFirstComments(post: any) {
@@ -264,7 +331,6 @@ export class PostsService {
           comment.liked = await this.isCommentLiked(post, comment);
           return { ...comment };
         }));
-        console.log(comments);
         return comments;
       });
     return comments;
@@ -302,9 +368,13 @@ export class PostsService {
       .limit(1)
       .get()
       .then((querySnapshot) => {
-        const reply = querySnapshot.docs[0].data();
-        reply.id = querySnapshot.docs[0].id;
-        return [reply];
+        if (querySnapshot.docs.length > 0) {
+          const reply = querySnapshot.docs[0].data();
+          reply.id = querySnapshot.docs[0].id;
+          return [reply];
+        } else {
+          return [];
+        }
       });
     return reply;
   }
@@ -392,6 +462,7 @@ export class PostsService {
         .get()
         .then((querySnapshot) => {
           querySnapshot.forEach((doc) => {
+            //TODO delete each comment of each post
             doc.ref.delete();
           });
         });
