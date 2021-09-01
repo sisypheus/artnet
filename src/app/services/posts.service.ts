@@ -610,4 +610,14 @@ export class PostsService {
       .delete();
     this.posts = this.posts.filter((object: any) => object.id !== post.id);
   }
+
+  addView(post: any) {
+    firebase.firestore()
+      .collection('posts')
+      .doc(post.creator)
+      .collection('userPosts')
+      .doc(post.id)
+      .update({ nbviews: firebase.firestore.FieldValue.increment(1) });
+    post.nbviews++;
+  }
 }

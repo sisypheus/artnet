@@ -23,6 +23,7 @@ export class PostComponent implements OnInit {
   replying: any = null;
   editing: any = null;
   comment: string = '';
+  playedFile: boolean = false;
 
   constructor(private router: Router, private postsService: PostsService, private uService: UserService, public auth: AuthService, public sanitizer: DomSanitizer) {
   }
@@ -52,6 +53,18 @@ export class PostComponent implements OnInit {
             reply.author = user?.displayName;
           });
         });
+      });
+    }
+  }
+
+  ngAfterViewChecked() {
+    if (this.post.file && !this.playedFile) {
+      const file = document.getElementById(this.post.id) as HTMLMediaElement;
+      file.addEventListener('play', () => {
+        if (!this.playedFile)
+          this.postsService.addView(this.post);
+        file.removeEventListener('play', () => {});
+        this.playedFile = true;
       });
     }
   }
