@@ -158,7 +158,7 @@ export class PostsService {
   likePost(post: any) {
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .collection('likes')
@@ -166,7 +166,7 @@ export class PostsService {
       .set({});
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .update({ likes: firebase.firestore.FieldValue.increment(1) });
@@ -185,7 +185,7 @@ export class PostsService {
       .delete();
     firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
       .update({ likes: firebase.firestore.FieldValue.increment(-1) });
