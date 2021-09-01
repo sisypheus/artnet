@@ -66,6 +66,7 @@ export class HomeComponent implements OnInit {
             likes: 0,
             creator: this.auth.user?.uid,
             nbComments: 0,
+            nbviews: 0,
           }).finally(() => {
             this.postsService.fetchAllPosts();
           });
