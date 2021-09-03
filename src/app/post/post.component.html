@@ -6,7 +6,7 @@
       <div class="relative">
         <img (click)="setOptions()" class="w-10 h-10 pr-4 pt-1 cursor-pointer" src="../../assets/img/more.svg" />
 
-        <div *ngIf="options && postOwner" class="flex items-center justify-center border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
+        <div *ngIf="options && postOwner" class="z-10 flex items-center justify-center border-2 border-black cursor-pointer origin-top-center absolute top-0 mt-8 w-40 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none">
           <div class="flex" (click)="deletePost(); setOptions()">
             <img class="w-9 h-9 py-1" src="../../assets/img/delete.svg" alt="Delete Icon">  
             <button class="block px-4 pl-1 py-2 text-base text-gray-700"
