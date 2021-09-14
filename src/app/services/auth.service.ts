@@ -1,3 +1,5 @@
+import { environment } from './../../environments/environment';
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore, AngularFirestoreDocument } from '@angular/fire/firestore';
@@ -17,10 +19,11 @@ export class AuthService {
         return of(null);
     }
   ));
+  private API = environment.API;
   loginPersistence: string | null = localStorage.getItem('login');
   user: firebase.User | null = null;
 
-  constructor(public afAuth: AngularFireAuth, public afs: AngularFirestore) {
+  constructor(private http: HttpClient, public afAuth: AngularFireAuth, public afs: AngularFirestore) {
     this.user$.subscribe(
       (user: firebase.User | null) => {
         this.user = user;
@@ -76,7 +79,7 @@ export class AuthService {
     const userRef: AngularFirestoreDocument<any> = this.afs.doc('users/' + user.uid);
 
     //necessary to avoid resetting user name
-    userRef.get().subscribe(
+    userRef.get().toPromise().then(
       (doc: any) => {
         const data = {
           uid: user.uid,
@@ -84,7 +87,24 @@ export class AuthService {
           displayName: name || doc?.data()?.displayName,
           photoURL: user.photoURL,
         }
-        userRef.set(data, { merge: true });
+        if (doc && doc.data()) {
+          if (data.displayName === doc.data().displayName &&
+          data.uid === doc.data().uid &&
+          data.email === doc.data().email &&
+          data.photoURL === doc.data().photoURL) {
+            return;
+          }
+        }
+        //backend call to add to algolia index
+        this.http.post<any>(this.API + 'create/user', data).toPromise().then(
+          (success: any) => {
+            console.log(success);
+          }, 
+          (error: any) => {
+            console.log(error);
+          }
+        );
+        //userRef.set(data, { merge: true });
       }
     );
   }

@@ -1,10 +1,48 @@
 <nav *ngIf="!hideNavbar" class="bg-gray-800 sticky top-0">
-  <div class="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-    <div class="relative flex items-center justify-between h-16">
+  <div class="max-w-7xl mx-auto px- sm:px-6 lg:px-8">
+    <div class="relative flex items-center justify-between h-16 mx-1">
       <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-        <div class="flex items-center">
-          <img [routerLink]="['/']" class="cursor-pointer block h-8 w-auto"
+        <div [routerLink]="['/']" class="flex items-center justify-between">
+          <div class="flex items-center">
+            <img class="h-8 w-8 sm:hidden absolute left-0 pl-2 cursor-pointer" src="../../assets/img/search.svg" alt="Search icon" (click)="toggleMobileSearch()" style="filter: invert(100%) sepia(1%) saturate(737%) hue-rotate(11deg) brightness(119%) contrast(100%);">
+            
+            <div *ngIf="showSearchInput && innerWidth <= 640" class="sm:hidden absolute top-16 bg-gray-700 transform left-0 text-xl font-extrabold text-white text-center w-full rounded-lg py-2">
+              <section>
+                <input [(ngModel)]="searchInput" (ngModelChange)="searchInputChanged()" class="bg-gray-700 text-center focus:outline-none focus:shadow-outline" type="text" placeholder="Search user" aria-label="Search" #search>
+              </section>
+              <section *ngIf="searchInput" class="p-2 border-t border-gray-600">
+                <div *ngFor="let user of uService.searchedUsers">
+                  <p>{{ user.displayName }}</p>
+                </div>
+                <div *ngIf="!uService.searchedUsers.length">
+                  <p>No users found</p>
+                </div>
+              </section>
+            </div>
+          </div>
+
+          <div class="flex items-center space-x-4">
+            <img class="cursor-pointer block h-8 w-auto"
             src="../../assets/img/logo.svg" style="height: 2rem" alt="Workflow">
+            <p class="text-white font-black italic text-xl hidden md:flex">Artnet</p>
+          </div>
+
+            <div class="hidden sm:flex flex-col text-gray-600 m-4">
+              <div>
+                <input [(ngModel)]="searchInput" (ngModelChange)="searchInputChanged()" class="border-2 border-gray-300 bg-white h-10 px-5 pr-5 rounded-lg text-sm focus:outline-none"
+                type="search" name="search" placeholder="Search User" autocomplete="off">
+              </div>
+              <div>
+                <section *ngIf="searchInput" class="text-white w-56 ml-0.5 rounded absolute p-2 border-t bg-gray-700 border-gray-600">
+                  <div class="p-2" *ngFor="let user of uService.searchedUsers">
+                    <p>{{ user.displayName }}</p>
+                  </div>
+                  <div *ngIf="!uService.searchedUsers.length">
+                    <p>No users found</p>
+                  </div>
+                </section>
+              </div>
+            </div>
         </div>
       </div>
       <div class="absolute right-0 flex items-center justify-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -19,7 +57,7 @@
               <img *ngIf="!auth.user?.photoURL" class="h-8 w-8 rounded-full"
                 src="https://www.acumarketing.com/acupuncture-websites/wp-content/uploads/2020/01/anonymous-avatar-sm.jpg"
                 alt="avatar image">
-              <img *ngIf="auth.user?.photoURL" class="h-8 w-8 rounded-full" [src]="auth.user?.photoURL" alt="">
+              <img *ngIf="auth.user?.photoURL" class="h-8 w-8 rounded-full" [src]="auth.user?.photoURL" alt="User icon">
               <p class="text-white ml-3 hidden sm:flex">
                 {{ auth.user?.displayName }}
               </p>
@@ -50,6 +88,4 @@
       </div>
     </div>
   </div>
-
-  <!-- Mobile menu, show/hide based on menu state. -->
 </nav>

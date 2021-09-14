@@ -13,6 +13,8 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
 import { PostsComponent } from './posts/posts.component';
+import { HttpClientModule } from '@angular/common/http';
+
 
 @NgModule({
   declarations: [
@@ -22,7 +24,7 @@ import { PostsComponent } from './posts/posts.component';
     NavbarComponent,
     ProfileComponent,
     PostComponent,
-    PostsComponent
+    PostsComponent,
   ],
   imports: [
     BrowserModule,
@@ -31,6 +33,7 @@ import { PostsComponent } from './posts/posts.component';
     AngularFireModule.initializeApp(environment.firebaseConfig),
     FormsModule,
     ReactiveFormsModule,
+    HttpClientModule,
   ],
   providers: [],
   bootstrap: [AppComponent]
