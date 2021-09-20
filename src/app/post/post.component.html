@@ -17,7 +17,7 @@
     </div>
     
     <!-- file handler -->
-    <div *ngIf="post.file" class="w-full h-108">
+    <div *ngIf="post.file" class="w-full max-h-96">
       <img *ngIf="post.fileType.includes('image/')" class="object-cover w-full h-96 mt-2 border-black" [src]="post.file" alt="Image of the post" />
       <audio [id]="this.post.id" *ngIf="post.fileType.includes('audio/')" class="w-full" controls>  
         <source [src]="post.file">

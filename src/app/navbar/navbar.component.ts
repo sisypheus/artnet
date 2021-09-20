@@ -24,7 +24,7 @@ export class NavbarComponent implements OnInit {
     this.innerWidth = window.innerWidth;
   }
 
-  constructor(private router: Router, public auth: AuthService, public uService: UserService) {
+  constructor(public router: Router, public auth: AuthService, public uService: UserService) {
     //check if we need to display or not the navbar
     //another check is to redirect to home if user is on /profile route
     this.router.events.subscribe((val) => {

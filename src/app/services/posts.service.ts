@@ -84,6 +84,26 @@ export class PostsService {
       });
   }
 
+  async fetchUserPostsFromUid(uid: string) {
+    return firebase.firestore()
+      .collection('posts')
+      .doc(uid)
+      .collection('userPosts')
+      .orderBy('created', 'desc')
+      .get()
+      .then(async (querySnapshot) => {
+        this.posts = querySnapshot.docs.map(async (doc) => {
+          const postdata = doc.data();
+          postdata.id = doc.id;
+          postdata.liked = await this.isPostLiked(postdata);
+          postdata.saved = await this.isPostSaved(postdata);
+          postdata.comments = await this.getFirstComments(postdata);
+          return { ...postdata };
+        });
+        this.posts = await Promise.all(this.posts).then((posts) => posts);
+      })
+  }
+
   async isPostLiked(post: any) {
     const exists = firebase.firestore()
       .collection('posts')

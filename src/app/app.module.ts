@@ -15,6 +15,7 @@ import { PostComponent } from './post/post.component';
 import { PostsComponent } from './posts/posts.component';
 import { HttpClientModule } from '@angular/common/http';
 import { UserComponent } from './user/user.component';
+import { NotfoundComponent } from './notfound/notfound.component';
 
 
 @NgModule({
@@ -27,6 +28,7 @@ import { UserComponent } from './user/user.component';
     PostComponent,
     PostsComponent,
     UserComponent,
+    NotfoundComponent,
   ],
   imports: [
     BrowserModule,

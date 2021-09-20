@@ -58,7 +58,7 @@ export class PostComponent implements OnInit {
   }
 
   ngAfterViewChecked() {
-    if (this.post.file && !this.playedFile) {
+    if (this.post.file && (!this.post.fileType.includes('image/')) && !this.playedFile) {
       const file = document.getElementById(this.post.id) as HTMLMediaElement;
       file.addEventListener('play', () => {
         if (!this.playedFile)
