@@ -2,29 +2,31 @@
   <div class="max-w-7xl mx-auto px- sm:px-6 lg:px-8">
     <div class="relative flex items-center justify-between h-16 mx-1">
       <div class="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-        <div [routerLink]="['/']" class="flex items-center justify-between">
-          <div class="flex items-center">
-            <img class="h-8 w-8 sm:hidden absolute left-0 pl-2 cursor-pointer" src="../../assets/img/search.svg" alt="Search icon" (click)="toggleMobileSearch()" style="filter: invert(100%) sepia(1%) saturate(737%) hue-rotate(11deg) brightness(119%) contrast(100%);">
-            
-            <div *ngIf="showSearchInput && innerWidth <= 640" class="sm:hidden absolute top-16 bg-gray-700 transform left-0 text-xl font-extrabold text-white text-center w-full rounded-lg py-2">
-              <section>
-                <input [(ngModel)]="searchInput" (ngModelChange)="searchInputChanged()" class="bg-gray-700 text-center focus:outline-none focus:shadow-outline" type="text" placeholder="Search user" aria-label="Search" #search>
-              </section>
-              <section *ngIf="searchInput" class="p-2 border-t border-gray-600">
-                <div *ngFor="let user of uService.searchedUsers">
-                  <p>{{ user.displayName }}</p>
-                </div>
-                <div *ngIf="!uService.searchedUsers.length">
-                  <p>No users found</p>
-                </div>
-              </section>
-            </div>
+        <div class="flex items-center justify-between cursor-pointer">
+            <div class="flex items-center">
+              <img class="h-8 w-8 sm:hidden absolute left-0 pl-2 cursor-pointer" src="../../assets/img/search.svg" alt="Search icon" (click)="toggleMobileSearch()" style="filter: invert(100%) sepia(1%) saturate(737%) hue-rotate(11deg) brightness(119%) contrast(100%);">
+              
+              <div *ngIf="showSearchInput && innerWidth <= 640" class="sm:hidden absolute top-16 bg-gray-700 transform left-0 text-xl font-extrabold text-white text-center w-full rounded-lg py-2">
+                <section>
+                  <input [(ngModel)]="searchInput" (ngModelChange)="searchInputChanged()" class="bg-gray-700 text-center focus:outline-none focus:shadow-outline" type="text" placeholder="Search user" aria-label="Search" #search>
+                </section>
+                <section *ngIf="searchInput" class="p-2 border-t border-gray-600">
+                  <div [routerLink]="'/user/test'" *ngFor="let user of uService.searchedUsers">
+                    <p>{{ user.displayName }}</p>
+                  </div>
+                  <div *ngIf="!uService.searchedUsers.length">
+                    <p>No users found</p>
+                  </div>
+                </section>
+              </div>
           </div>
 
-          <div class="flex items-center space-x-4">
-            <img class="cursor-pointer block h-8 w-auto"
-            src="../../assets/img/logo.svg" style="height: 2rem" alt="Workflow">
-            <p class="text-white font-black italic text-xl hidden md:flex">Artnet</p>
+          <div routerLink="/">
+            <div class="flex items-center space-x-4">
+              <img class="cursor-pointer block h-8 w-auto"
+              src="../../assets/img/logo.svg" style="height: 2rem" alt="Workflow">
+              <p class="text-white font-black italic text-xl hidden md:flex">Artnet</p>
+            </div>
           </div>
 
             <div class="hidden sm:flex flex-col text-gray-600 m-4">
@@ -34,9 +36,11 @@
               </div>
               <div>
                 <section *ngIf="searchInput" class="text-white w-56 ml-0.5 rounded absolute p-2 border-t bg-gray-700 border-gray-600">
-                  <div class="p-2" *ngFor="let user of uService.searchedUsers">
-                    <p>{{ user.displayName }}</p>
-                  </div>
+                    <div class="p-2" *ngFor="let user of uService.searchedUsers">
+                      <a (click)="log('test')" routerLink='/user/test'>
+                        <p>{{ user.displayName }}</p>
+                      </a>
+                    </div>
                   <div *ngIf="!uService.searchedUsers.length">
                     <p>No users found</p>
                   </div>
@@ -78,7 +82,7 @@
         <!-- user not signed in specific view-->
         <ng-template #notLoggedIn>
           <div class="ml-3 relative">
-            <button [routerLink]="['/auth']"
+            <button routerLink="/profile"
               class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded">
               Sign In
             </button>

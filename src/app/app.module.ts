@@ -14,6 +14,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { PostComponent } from './post/post.component';
 import { PostsComponent } from './posts/posts.component';
 import { HttpClientModule } from '@angular/common/http';
+import { UserComponent } from './user/user.component';
 
 
 @NgModule({
@@ -25,6 +26,7 @@ import { HttpClientModule } from '@angular/common/http';
     ProfileComponent,
     PostComponent,
     PostsComponent,
+    UserComponent,
   ],
   imports: [
     BrowserModule,

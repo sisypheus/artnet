@@ -2,7 +2,7 @@ import { UserService } from './../services/user.service';
 import { AngularFirestoreDocument } from '@angular/fire/firestore';
 import { AuthService } from './../services/auth.service';
 import { Component, OnInit } from '@angular/core';
-import { NavigationEnd, NavigationStart, Router } from '@angular/router';
+import { NavigationEnd, NavigationStart, Router, RouterLink } from '@angular/router';
 import firebase from 'firebase/app';
 import { HostListener } from '@angular/core';
 
