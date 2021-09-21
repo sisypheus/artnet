@@ -32,11 +32,11 @@ export class UserComponent implements OnInit {
     if (this.current !== selected) {
       this.current = selected;
       if (selected === 'Liked')
-        this.postsService.getLikedPosts();
+        this.postsService.getLikedPostsFromUid(this.user.uid);
       else if (selected === 'Posts')
-        this.postsService.fetchUserPosts();
+        this.postsService.fetchUserPostsFromUid(this.user.uid);
       else {
-        this.postsService.getSavedPosts();
+        this.postsService.getSavedPostsFromUid(this.user.uid);
       }
     }
   }

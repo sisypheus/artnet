@@ -1,17 +1,20 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import firebase from 'firebase/app';
 import { EventEmitter } from '@angular/core';
 import { AuthService } from './auth.service';
 import { DocumentReference } from '@angular/fire/firestore';
 import { concat } from 'rxjs';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PostsService {
   posts: any = [];
+  API: string = environment.API;
 
-  constructor(private auth: AuthService, private ref: ApplicationRef) { }
+  constructor(private auth: AuthService, private ref: ApplicationRef, private http: HttpClient) { }
 
   async fetchAllPosts() {
     return firebase.firestore()
@@ -102,6 +105,16 @@ export class PostsService {
         });
         this.posts = await Promise.all(this.posts).then((posts) => posts);
       })
+  }
+
+  async getLikedPostsFromUid(uid: string) {
+    await this.fetchUserPostsFromUid(uid);
+    this.posts = this.posts.filter((post: any) => post.liked);
+  }
+
+  async getSavedPostsFromUid(uid: string) {
+    await this.fetchUserPostsFromUid(uid);
+    this.posts = this.posts.filter((post: any) => post.saved);
   }
 
   async isPostLiked(post: any) {
@@ -221,7 +234,6 @@ export class PostsService {
   async getSavedPosts() {
     await this.fetchAllPostsLogin();
     this.posts = this.posts.filter((post: any) => post.saved);
-    console.log(this.posts);
   }
 
   addComment(post: any, comment: string) {
@@ -640,4 +652,39 @@ export class PostsService {
       .update({ nbviews: firebase.firestore.FieldValue.increment(1) });
     post.nbviews++;
   }
+
+  //      DANGER DANGER DANGER
+  //      DANGER DANGER DANGER
+  //      DANGER DANGER DANGER
+  // deleteAllUsers() {
+  //   firebase.firestore()
+  //     .collectionGroup('users')
+  //     .get()
+  //     .then((querySnapshot) => {
+  //       querySnapshot.forEach((doc) => {
+  //         const options = { body: {user: doc.ref.path}}
+  //         this.http.delete(`${this.API}delete/user/`, options).subscribe(() => {
+  //           console.log('user deleted')
+  //         }, (err) => {
+  //           console.log(err);
+  //         });
+  //       })
+  //     })
+  // }
+
+  // deleteAllPosts() {
+  //   firebase.firestore()
+  //     .collectionGroup('userPosts')
+  //     .get()
+  //     .then((querySnapshot) => {
+  //       querySnapshot.forEach((doc) => {
+  //         const options = { body: {document: doc.ref.path}}
+  //         this.http.delete(`${this.API}delete/recursive/`, options).subscribe(() => {
+  //           console.log('document deleted')
+  //         }, (err) => {
+  //           console.log(err);
+  //         });
+  //       })
+  //     })
+  // }
 }

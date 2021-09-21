@@ -84,7 +84,7 @@ export class AuthService {
         const data = {
           uid: user.uid,
           email: user.email,
-          displayName: name || doc?.data()?.displayName,
+          displayName: name || user.displayName,
           photoURL: user.photoURL,
         }
         if (doc && doc.data()) {
@@ -96,15 +96,10 @@ export class AuthService {
           }
         }
         //backend call to add to algolia index
-        this.http.post<any>(this.API + 'create/user', data).toPromise().then(
-          (success: any) => {
-            console.log(success);
-          }, 
-          (error: any) => {
-            console.log(error);
-          }
+        this.http.post(this.API + 'create/user', data).toPromise().then(
+          (success: any) => null, 
+          (error: any) => error
         );
-        //userRef.set(data, { merge: true });
       }
     );
   }

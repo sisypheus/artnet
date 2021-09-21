@@ -1,5 +1,6 @@
 <div class="flex items-center justify-center">
   <div class="max-w-lg mt-3">
+    <p class="flex justify-center text-4xl text-blue-500 font-extrabold my-6"><span class="font-black">{{ user?.displayName }}</span>'s profile</p>
     <div class="flex flex-row space-x-5 justify-center">
       <p (click)="setCurrent('Posts')" [class]="current === 'Posts' ? selected : not">
         Posts

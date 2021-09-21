@@ -49,7 +49,7 @@
         </div>
 
         <!-- views -->
-        <div *ngIf="post.file" class="flex items-start pl-1">
+        <div *ngIf="post.file && (!post.fileType.includes('image/'))" class="flex items-start pl-1">
           {{ post.nbviews }} views
         </div>
       </div>
