@@ -23,25 +23,14 @@ export class PostsService {
       .get()
       .then(async (snapshot: any) => {
         this.auth.user$.subscribe(async (user) => {
-          if (user) {
-            this.posts = snapshot.docs.map(async (doc: any) => {
-              const postdata = doc.data();
-              postdata.id = doc.id;
-              postdata.liked = await this.isPostLiked(postdata);
-              postdata.saved = await this.isPostSaved(postdata);
-              postdata.comments = await this.getFirstComments(postdata);
-              return { ...postdata };
-            });
-          } else {
-            this.posts = snapshot.docs.map(async (doc: any) => {
-              const postdata = doc.data();
-              postdata.id = doc.id;
-              postdata.liked = false;
-              postdata.saved = false;
-              postdata.comments = await this.getFirstComments(postdata);
-              return { ...postdata };
-            });
-          }
+          this.posts = snapshot.docs.map(async (doc: any) => {
+            const postdata = doc.data();
+            postdata.id = doc.id;
+            postdata.liked = user ? await this.isPostLiked(postdata) : false;
+            postdata.saved = user ? await this.isPostSaved(postdata) : false;
+            postdata.comments = user ? await this.getFirstComments(postdata) : false;
+            return { ...postdata };
+          });
           this.posts = await Promise.all(this.posts).then((posts) => posts);
         });
       });
@@ -332,47 +321,7 @@ export class PostsService {
   }
 
   deleteComment(post: any, comment: any) {
-    //deleting all subcollections of this comment
-    firebase.firestore()
-      .collection('posts')
-      .doc(post.creator)
-      .collection('userPosts')
-      .doc(post.id)
-      .collection('comments')
-      .doc(comment.id)
-      .collection('replies')
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.docs.map((doc) => {
-          //deleting all likes of each reply
-          doc.ref
-            .collection('likes')
-            .get()
-            .then((querySnapshot) => {
-              querySnapshot.forEach((doc) => {
-                doc.ref.delete();
-              });
-            });
-          doc.ref.delete();
-        });
-      });
-
-    //deleting all likes record of this comment
-    firebase.firestore()
-      .collection('posts')
-      .doc(post.creator)
-      .collection('userPosts')
-      .doc(post.id)
-      .collection('likes')
-      .get()
-      .then((querySnapshot) => {
-        querySnapshot.docs.forEach((doc) => {
-          doc.ref.delete();
-        });
-      });
-
-    //delete the post document
-    firebase.firestore()
+    const doc = firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
@@ -380,11 +329,12 @@ export class PostsService {
       .collection('comments')
       .doc(comment.id)
       .get()
-      .then((doc) => {
-        doc.ref.delete();
+      .then((querySnapshot) => {
+        const options = { body: {document: querySnapshot.ref.path} };
+        this.http.delete(`${this.API}delete/recursive/`, options).subscribe();
       });
     //update number of comments of post
-      firebase.firestore()
+    firebase.firestore()
       .collection('posts')
       .doc(post.creator)
       .collection('userPosts')
@@ -615,31 +565,16 @@ export class PostsService {
   deletePost(post: any) {
     if (post.file)
       firebase.storage().refFromURL(post.file).delete().catch((err) => { console.log(err); });
-    //delete first the subcollections of the post
-    const collection = ['likes', 'comments', 'saved'];
-    for (let i = 0; i < 3; i++) {
-      firebase.firestore()
-        .collection('posts')
-        .doc(this.auth.user?.uid)
-        .collection('userPosts')
-        .doc(post.id)
-        .collection(collection[i])
-        .get()
-        .then((querySnapshot) => {
-          querySnapshot.forEach((doc) => {
-            if (collection[i] === 'comments') {
-              this.deleteComment(post, { ...doc.data(), id: doc.id });
-            }
-            doc.ref.delete();
-          });
-        });
-    }
-    firebase.firestore()
+    const doc = firebase.firestore()
       .collection('posts')
-      .doc(this.auth.user?.uid)
+      .doc(post.creator)
       .collection('userPosts')
       .doc(post.id)
-      .delete();
+      .get()
+      .then((querySnapshot) => {
+        const options = { body: {document: querySnapshot.ref.path} };
+        this.http.delete(`${this.API}delete/recursive/`, options).subscribe();
+      });
     this.posts = this.posts.filter((object: any) => object.id !== post.id);
   }
 

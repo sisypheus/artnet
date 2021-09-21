@@ -97,7 +97,7 @@ export class AuthService {
         }
         //backend call to add to algolia index
         this.http.post(this.API + 'create/user', data).toPromise().then(
-          (success: any) => null, 
+          (_: any) => null, 
           (error: any) => error
         );
       }
