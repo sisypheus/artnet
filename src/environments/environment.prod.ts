@@ -9,5 +9,5 @@ export const environment = {
     appId: "1:480208730284:web:78fd1b71a07e62c6880709",
     measurementId: "G-0LZ1GD9WQZ"
   },
-  API: 'https://theopoette.me/api/artnet_back/',
+  API: 'https://artnet-server.herokuapp.com/',
 };
